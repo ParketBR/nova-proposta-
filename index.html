@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Proposta 99918 · Parket</title>
+<meta name="theme-color" content="#1A1A1A">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231A1A1A'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui, -apple-system, sans-serif' font-weight='300' font-size='38' fill='%23FFFFFF'%3EP%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231A1A1A'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui, -apple-system, sans-serif' font-weight='300' font-size='38' fill='%23FFFFFF'%3EP%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://parket.com.br">
+<!-- A Parket usa DM Sans em toda a marca, sem serifada. 1 família · 4 pesos. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@200;300;400;500&display=swap">
+<link rel="preload" as="image" href="logo/logo-parket.png" fetchpriority="high">
+<link rel="preload" as="image" href="https://parket.com.br/FOTO%20HERO.jpg" fetchpriority="high">
+
+<script>document.documentElement.className = 'js';</script>
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   PARKET — PROPOSTA COMERCIAL DIGITAL
+   Tokens em 3 níveis: primitivo → semântico → componente.
+   A UI nunca consome primitivo direto.  (Obsidian › 07 Design System)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. PRIMITIVOS ─────────────────────────────────────────────────── */
+/* Valores medidos em parket.com.br: papel #FAF8F5, escuro #1A1A1A,
+   tinta #2A2A2A, texto claro #E8E4DF, bronze #9C8B6E e #B5A48A.        */
+:root {
+  /* Papel */
+  --stone-0:#FFFFFF;   --stone-50:#FAF8F5;  --stone-100:#F1EEE8;
+  --stone-150:#F0EBE3; --stone-200:#E5DFD5; --stone-300:#D3CCC0;
+  /* Tinta */
+  --stone-400:#8C8478; --stone-500:#756E62; --stone-600:#5F594F;
+  --stone-800:#2A2A2A; --stone-900:#1A1A1A; --stone-950:#0D0D0D;
+  --bone-100:#E8E4DF;  --bone-400:#9A968F;
+  /* Bronze — o acento da marca (não o dourado do gerador antigo) */
+  --bronze-300:#B5A48A; --bronze-500:#9C8B6E; --bronze-700:#6F6248;
+  /* Sistema */
+  --green-600:#3F7A55; --red-600:#B4463C;
+
+  /* Espaçamento — base 4px */
+  --space-1:.25rem;  --space-2:.5rem;   --space-3:.75rem;  --space-4:1rem;
+  --space-6:1.5rem;  --space-8:2rem;    --space-12:3rem;   --space-16:4rem;
+  --space-24:6rem;   --space-32:8rem;
+
+  /* Tipografia — família única, como a marca.
+     Títulos: peso 200, tracking +.02em, entrelinha 1.1
+     Corpo:   peso 300, entrelinha 1.5
+     Rótulos: peso 500, caixa alta, tracking +.1em                      */
+  --font-sans:'DM Sans', system-ui, -apple-system, sans-serif;
+  --weight-display:200; --weight-body:300; --weight-label:500;
+  --track-display:.02em; --track-label:.1em;
+  --text-2xs:.6875rem; --text-xs:.75rem;  --text-sm:.8125rem; --text-base:.875rem;
+  --text-md:1rem;      --text-lg:1.25rem;
+
+  /* Motion */
+  --duration-instant:100ms; --duration-fast:150ms;
+  --duration-base:250ms;    --duration-slow:400ms;  --duration-slower:700ms;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --ease-in-out:cubic-bezier(.4,0,.2,1);
+
+  /* Camadas */
+  --z-content:0; --z-sticky:200; --z-rail:300; --z-overlay:400;
+}
+
+/* ── 2. SEMÂNTICOS ────────────────────────────────────────────────── */
+:root {
+  --color-bg:              var(--stone-50);
+  --color-bg-alt:          var(--stone-100);
+  --color-bg-inverse:      var(--stone-900);
+  --color-line:            var(--stone-200);
+  --color-line-strong:     var(--stone-300);
+  --color-line-inverse:    #333333;
+
+  --color-text:            var(--stone-800);   /* 13,6:1 sobre papel */
+  --color-text-muted:      var(--stone-600);   /*  6,6:1 */
+  --color-text-faint:      var(--stone-500);   /*  4,8:1 — mínimo AA em texto pequeno */
+  --color-text-inverse:    var(--bone-100);
+  --color-text-inverse-muted:var(--bone-400);  /*  5,3:1 sobre escuro */
+
+  --color-accent:          var(--bronze-300);  /* bronze sobre escuro — 6,9:1 */
+  --color-accent-ink:      var(--bronze-700);  /* bronze sobre papel  — 5,6:1 */
+  --color-accent-line:     var(--bronze-500);  /* réguas e indicadores, nunca texto */
+  --color-focus:           var(--bronze-500);
+  --color-success:         var(--green-600);
+  --color-danger:          var(--red-600);
+}
+
+/* ── 3. DE COMPONENTE ─────────────────────────────────────────────── */
+:root {
+  --rail-w:0px;
+  /* Altura TOTAL ocupada pela barra inferior no mobile — inclui o home
+     indicator. Tudo que precisa se desviar do trilho (padding do .chapter,
+     limite do .runner sticky, rodapé da capa) lê esta única variável. */
+  --rail-h:calc(60px + env(safe-area-inset-bottom, 0px));
+  --pad-x:clamp(1.25rem, 5vw, 5rem);
+  --pad-y:clamp(1.75rem, 5vh, 4.5rem);
+  --measure:64ch;
+  --tap-min:44px;
+  --field-h:46px;
+  --radius:2px;                  /* cantos praticamente retos — arquitetônico */
+}
+@media (min-width:1024px){ :root{ --rail-w:96px;  --rail-h:0px; } }
+@media (min-width:1280px){ :root{ --rail-w:236px; } }
+
+/* ── Reset ────────────────────────────────────────────────────────── */
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+html,body{ height:100%; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  font-family:var(--font-sans);
+  font-size:1rem;                  /* 16px, como o site */
+  font-weight:var(--weight-body);  /* 300 */
+  line-height:1.5;
+  letter-spacing:.01em;
+  color:var(--color-text);
+  background:var(--color-bg-inverse);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow:hidden;
+}
+img,video{ display:block; max-width:100%; }
+button,input,select,textarea{ font:inherit; color:inherit; }
+a{ color:inherit; text-decoration:none; }
+ol,ul{ list-style:none; }
+table{ border-collapse:collapse; width:100%; }
+:focus-visible{ outline:2px solid var(--color-focus); outline-offset:3px; }
+/* Precisa vencer as regras de display dos componentes (.done, .form…) */
+[hidden]{ display:none !important; }
+.sr-only{
+  position:absolute; width:1px; height:1px; overflow:hidden;
+  clip-path:inset(50%); white-space:nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NAVEGAÇÃO — trilho lateral (desktop) / barra inferior (mobile)
+   Responde a: onde estou → onde posso ir → o que já vi → o que falta
+   ═══════════════════════════════════════════════════════════════════ */
+.rail{
+  position:fixed; z-index:var(--z-rail);
+  inset:auto 0 0 0; height:var(--rail-h);
+  display:flex; align-items:center; gap:var(--space-2);
+  padding:0 var(--space-3);
+  background:var(--rail-bg);
+  border-top:1px solid var(--rail-line);
+  transition:background var(--duration-slow) var(--ease-in-out),
+             border-color var(--duration-slow) var(--ease-in-out);
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+}
+/* Tom do trilho acompanha o capítulo atual */
+body{ --rail-bg:var(--color-bg-inverse); --rail-line:var(--color-line-inverse);
+       --rail-fg:var(--color-text-inverse); --rail-fg-dim:var(--color-text-inverse-muted);
+       --rail-accent:var(--color-accent); --rail-logo-filter:none; }
+body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line);
+       --rail-fg:var(--color-text); --rail-fg-dim:var(--color-text-faint);
+       --rail-accent:var(--color-accent-ink); --rail-logo-filter:invert(1); }
+
+.rail__brand{ display:none; }
+.rail__logo{ height:14px; width:auto; filter:var(--rail-logo-filter);
+             transition:filter var(--duration-slow) var(--ease-in-out); }
+
+.rail__list{
+  display:flex; flex:1; min-width:0; gap:var(--space-1);
+  overflow-x:auto; scrollbar-width:none; scroll-behavior:smooth;
+}
+.rail__list::-webkit-scrollbar{ display:none; }
+
+.rail__item{
+  display:flex; align-items:center; gap:var(--space-2);
+  min-height:var(--tap-min); padding:0 var(--space-3);
+  color:var(--rail-fg-dim); white-space:nowrap;
+  transition:color var(--duration-base) var(--ease-out);
+}
+.rail__num{
+  font-weight:var(--weight-display); font-size:var(--text-sm);
+  line-height:1; letter-spacing:.02em; font-variant-numeric:tabular-nums;
+}
+.rail__label{
+  font-size:var(--text-2xs); font-weight:500;
+  letter-spacing:var(--track-label); text-transform:uppercase;
+  display:none;
+}
+.rail__tick{
+  width:0; height:1px; background:currentColor; flex:none;
+  transition:width var(--duration-base) var(--ease-out);
+}
+.rail__item:hover,.rail__item:focus-visible{ color:var(--rail-fg); }
+.rail__item:hover .rail__tick{ width:12px; }
+.rail__item.is-seen{ color:var(--rail-fg); opacity:.62; }
+.rail__item.is-current{ color:var(--rail-fg); opacity:1; }
+.rail__item.is-current .rail__num{ color:var(--rail-accent); }
+.rail__item.is-current .rail__label{ display:inline; }
+.rail__item.is-current .rail__tick{ width:20px; background:var(--rail-accent); }
+
+.rail__foot{ display:none; }
+.rail__pos{
+  font-size:var(--text-2xs); font-weight:500; letter-spacing:.14em;
+  color:var(--rail-fg-dim); font-variant-numeric:tabular-nums; flex:none;
+}
+.rail__pos b{ color:var(--rail-fg); font-weight:500; }
+.rail__bar{ height:1px; background:var(--rail-line); overflow:hidden; }
+.rail__bar i{
+  display:block; height:100%; width:12.5%;
+  background:var(--rail-accent);
+  transition:width var(--duration-slow) var(--ease-out);
+}
+
+@media (min-width:1024px){
+  .rail{
+    inset:0 auto 0 0; width:var(--rail-w); height:100%;
+    flex-direction:column; align-items:stretch; justify-content:space-between;
+    gap:var(--space-6); padding:var(--space-8) var(--space-4);
+    border-top:0; border-right:1px solid var(--rail-line);
+  }
+  .rail__brand{ display:block; padding-inline:var(--space-2); }
+  .rail__list{ flex-direction:column; flex:0 1 auto; gap:0; overflow:visible; }
+  .rail__item{ padding:var(--space-2); gap:var(--space-3); }
+  .rail__item.is-current .rail__label{ display:none; }
+  .rail__foot{ display:flex; flex-direction:column; gap:var(--space-3);
+               padding-inline:var(--space-2); }
+}
+@media (min-width:1280px){
+  .rail{ padding:var(--space-12) var(--space-8); }
+  .rail__logo{ height:18px; }
+  .rail__label{ display:inline; }
+  .rail__item.is-current .rail__label{ display:inline; }
+  .rail__num{ min-width:1.6em; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   VINHETA DE ABERTURA — logo antes do vídeo
+   Só existe com JS (senão o overlay prenderia a tela para sempre) e
+   nunca aparece sob prefers-reduced-motion, onde viraria um flash.
+   ═══════════════════════════════════════════════════════════════════ */
+.intro{
+  --veil-logo-h:clamp(20px, 3.5vw, 30px);
+  position:fixed; inset:0; z-index:var(--z-overlay);
+  display:none; flex-direction:column; align-items:center; justify-content:center;
+  gap:0; background:var(--color-bg-inverse);
+  transition:opacity var(--duration-slower) var(--ease-in-out);
+}
+.js .intro{ display:flex; }
+.intro__logo{
+  height:var(--veil-logo-h); width:auto;
+  opacity:0; transform:translateY(6px);
+  transition:opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
+}
+.intro__line{
+  width:calc(var(--veil-logo-h) * 4.6); height:1px; background:var(--color-accent);
+  margin-top:var(--space-3);
+  transform:scaleX(0); transform-origin:left center;
+  transition:transform 700ms var(--ease-out) 220ms;
+}
+.intro.is-in .intro__logo{ opacity:1; transform:none; }
+.intro.is-in .intro__line{ transform:scaleX(1); }
+.intro.is-out{ opacity:0; pointer-events:none; }
+
+.skip{
+  position:absolute; left:-9999px; top:0; z-index:var(--z-overlay);
+  background:var(--color-bg); color:var(--color-text);
+  display:flex; align-items:center; min-height:var(--tap-min);
+  padding:var(--space-3) var(--space-4); font-size:var(--text-sm);
+}
+.skip:focus{ left:var(--space-4); top:var(--space-4); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   DECK — capítulos no eixo horizontal (carrossel intencional)
+   Conteúdo interno rola no eixo VERTICAL. Nunca scroll horizontal de texto.
+   ═══════════════════════════════════════════════════════════════════ */
+.deck{
+  display:flex; width:100%; height:100%;
+  overflow-x:auto; overflow-y:hidden;
+  scroll-snap-type:x mandatory; scroll-behavior:smooth;
+  scrollbar-width:none; overscroll-behavior-x:contain;
+}
+.deck::-webkit-scrollbar{ display:none; }
+
+.chapter{
+  flex:0 0 100%; width:100%; height:100%;
+  scroll-snap-align:start; scroll-snap-stop:always;
+  overflow-y:auto; overflow-x:hidden;
+  /* Sem -webkit-overflow-scrolling:touch — a propriedade é obsoleta (o iOS 13+
+     já rola com inércia) e aciona um caminho de composição legado que solta
+     o position:sticky do total dentro deste contêiner. */
+  overscroll-behavior-y:contain; scrollbar-width:thin;
+  background:var(--color-bg); color:var(--color-text);
+  padding-bottom:var(--rail-h);
+}
+@media (min-width:1024px){ .chapter{ padding-left:var(--rail-w); padding-bottom:0; } }
+.chapter--dark{ background:var(--color-bg-inverse); color:var(--color-text-inverse); }
+
+.wrap{ padding:var(--pad-y) var(--pad-x); }
+.wrap--tall{ min-height:100%; display:flex; flex-direction:column; justify-content:center; }
+
+/* ── Tipografia editorial ─────────────────────────────────────────── */
+.eyebrow{
+  display:flex; align-items:baseline; gap:var(--space-3);
+  font-size:var(--text-2xs); font-weight:500;
+  letter-spacing:var(--track-label); text-transform:uppercase;
+  color:var(--color-text-faint);
+}
+.chapter--dark .eyebrow{ color:var(--color-text-inverse-muted); }
+.eyebrow__n{
+  font-weight:var(--weight-display); font-size:var(--text-sm);
+  letter-spacing:.04em; color:var(--color-accent-ink); text-transform:none;
+}
+.chapter--dark .eyebrow__n{ color:var(--color-accent); }
+
+.display{
+  font-weight:var(--weight-display);
+  font-size:clamp(1.9rem, 1.1rem + 3.4vw, 4rem);
+  line-height:1.1; letter-spacing:var(--track-display);
+  max-width:18ch; text-wrap:balance;
+}
+.display--sm{ font-size:clamp(1.5rem, 1rem + 2.2vw, 2.6rem); max-width:22ch; }
+.lede{
+  font-size:1.0625rem; font-weight:var(--weight-body); line-height:1.55;
+  color:var(--color-text-muted); max-width:var(--measure);
+}
+.chapter--dark .lede{ color:var(--color-text-inverse-muted); }
+.body{ max-width:var(--measure); color:var(--color-text-muted); }
+.chapter--dark .body{ color:var(--color-text-inverse-muted); }
+
+.rule{ height:1px; background:var(--color-line); border:0; }
+.chapter--dark .rule{ background:var(--color-line-inverse); }
+
+.section-head{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:var(--space-4); padding-bottom:var(--space-3);
+  border-bottom:1px solid var(--color-line);
+  font-size:var(--text-2xs); font-weight:var(--weight-label);
+  letter-spacing:var(--track-label); text-transform:uppercase;
+}
+.chapter--dark .section-head{ border-color:var(--color-line-inverse); }
+.section-head span:last-child{ font-weight:400; color:var(--color-text-faint); letter-spacing:.1em; }
+
+/* ── Reveal: só camadas decorativas; sem JS tudo aparece ──────────── */
+.js .reveal{ opacity:0; transform:translateY(10px); }
+.js .is-active .reveal{
+  opacity:1; transform:none;
+  transition:opacity var(--duration-slow) var(--ease-out),
+             transform var(--duration-slow) var(--ease-out);
+}
+.js .is-active .reveal:nth-child(2){ transition-delay:60ms; }
+.js .is-active .reveal:nth-child(3){ transition-delay:120ms; }
+.js .is-active .reveal:nth-child(4){ transition-delay:180ms; }
+
+/* ── Botão / avanço de capítulo ───────────────────────────────────── */
+.next{
+  display:inline-flex; align-items:center; gap:var(--space-3);
+  min-height:var(--tap-min); padding:var(--space-3) 0;
+  font-size:var(--text-2xs); font-weight:var(--weight-label);
+  letter-spacing:var(--track-label); text-transform:uppercase;
+  border-bottom:1px solid currentColor; align-self:flex-start;
+  transition:gap var(--duration-base) var(--ease-out);
+}
+.next:hover{ gap:var(--space-6); }
+
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:var(--space-3);
+  min-height:var(--tap-min); padding:var(--space-4) var(--space-8);
+  background:var(--color-text-inverse); color:var(--color-bg-inverse);
+  border:1px solid transparent; border-radius:var(--radius); cursor:pointer;
+  font-size:var(--text-2xs); font-weight:var(--weight-label); letter-spacing:var(--track-label); text-transform:uppercase;
+  transition:opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+}
+.btn:hover{ opacity:.86; }
+.btn:active{ transform:scale(.985); }
+.btn:disabled{ opacity:.4; cursor:not-allowed; }
+.btn--ghost{
+  background:transparent; color:inherit; border-color:currentColor;
+}
+
+/* ═══ 01 · CAPA ════════════════════════════════════════════════════ */
+.chapter--cover{ padding-left:0; position:relative; }
+.cover__media{ position:absolute; inset:0; overflow:hidden; background:var(--stone-950); }
+.cover__video{
+  width:100%; height:100%; object-fit:cover; object-position:center;
+  opacity:0; transition:opacity var(--duration-slower) var(--ease-out);
+}
+.cover__video.is-ready{ opacity:1; }
+/* O vídeo tem frames muito claros (parede branca de galeria). Um scrim leve
+   derrubava o contraste do texto para ~2:1. Duas camadas: uma vertical, que
+   sustenta o rodapé, e uma horizontal presa à coluna de texto — a direita do
+   quadro fica aberta para a imagem respirar. Mede ~10:1 no pior frame. */
+.cover__scrim{
+  position:absolute; inset:0;
+  background:linear-gradient(to top,
+      rgba(13,13,13,.93) 0%, rgba(13,13,13,.62) 34%,
+      rgba(13,13,13,.34) 68%, rgba(13,13,13,.22) 100%);
+}
+@media (min-width:768px){
+  .cover__scrim{
+    background:
+      linear-gradient(to top,
+        rgba(13,13,13,.92) 0%, rgba(13,13,13,.50) 35%,
+        rgba(13,13,13,.22) 70%, rgba(13,13,13,.12) 100%),
+      linear-gradient(to right,
+        rgba(13,13,13,.74) 0%, rgba(13,13,13,.38) 45%, rgba(13,13,13,0) 76%);
+  }
+}
+.cover__inner{
+  position:relative; min-height:100%;
+  display:flex; flex-direction:column; justify-content:space-between;
+  gap:var(--space-12);
+  padding:var(--pad-y) var(--pad-x) calc(var(--pad-y) + var(--rail-h));
+  color:var(--color-text-inverse);
+}
+@media (min-width:1024px){
+  .cover__inner{ padding-left:calc(var(--rail-w) + var(--pad-x)); padding-bottom:var(--pad-y); }
+  .cover__logo{ display:none; }
+}
+.cover__logo{ height:clamp(14px, 1.8vw, 20px); width:auto; align-self:flex-start; flex:none; }
+.cover__main{ margin-top:auto; }
+.cover__title{
+  font-weight:var(--weight-display);
+  font-size:clamp(2.4rem, 1.2rem + 5.6vw, 6.5rem);
+  line-height:1.06; letter-spacing:var(--track-display);
+}
+.cover__sub{
+  margin-top:var(--space-4); font-size:var(--text-md);
+  color:rgba(232,228,223,.72); letter-spacing:.01em;
+}
+.cover__meta{
+  display:flex; flex-wrap:wrap; gap:var(--space-4) var(--space-12);
+  margin-top:var(--space-12);
+  padding-top:var(--space-6); border-top:1px solid rgba(232,228,223,.18);
+}
+/* Telas pequenas ou baixas: comprime a capa para o CTA caber sem rolagem */
+@media (max-width:400px), (max-height:700px){
+  .cover__inner{ gap:var(--space-6); }
+  .cover__title{ font-size:clamp(2rem, 1.1rem + 4.6vw, 3rem); }
+  .cover__sub{ margin-top:var(--space-2); font-size:var(--text-base); }
+  .cover__meta{ margin-top:var(--space-6); gap:var(--space-3) var(--space-8);
+                padding-top:var(--space-4); }
+  .cover__foot p{ display:none; }   /* assinatura de marca cede ao CTA */
+}
+.cover__meta div{ display:flex; flex-direction:column; gap:var(--space-1); }
+.cover__meta dt{
+  font-size:var(--text-2xs); font-weight:500; letter-spacing:var(--track-label);
+  text-transform:uppercase; color:rgba(232,228,223,.5);
+}
+.cover__meta dd{ font-size:var(--text-base); color:var(--color-text-inverse); }
+.cover__foot{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--space-6); }
+
+/* ═══ 02 · PROJETO ═════════════════════════════════════════════════ */
+.spec{
+  display:grid; gap:0;
+  grid-template-columns:1fr;
+  margin-top:var(--space-8);
+}
+@media (min-width:768px){ .spec{ grid-template-columns:repeat(2,1fr); column-gap:var(--space-16); } }
+@media (min-width:1280px){ .spec{ grid-template-columns:repeat(3,1fr); } }
+.spec__row{
+  display:flex; flex-direction:column; gap:var(--space-1);
+  padding:var(--space-4) 0; border-bottom:1px solid var(--color-line-inverse);
+}
+.spec__k{
+  font-size:var(--text-2xs); font-weight:500; letter-spacing:var(--track-label);
+  text-transform:uppercase; color:var(--color-text-inverse-muted);
+}
+.spec__v{ font-size:var(--text-md); }
+
+.figures{
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:var(--space-4); margin-top:var(--space-12);
+  padding-top:var(--space-8); border-top:1px solid var(--color-line-inverse);
+}
+.figures__n{
+  font-weight:var(--weight-display); font-size:clamp(1.8rem, 1rem + 2.8vw, 3.2rem);
+  line-height:1; color:var(--color-accent); font-variant-numeric:tabular-nums;
+}
+.figures__l{
+  margin-top:var(--space-2); font-size:var(--text-2xs); font-weight:500;
+  letter-spacing:var(--track-label); text-transform:uppercase; color:var(--color-text-inverse-muted);
+}
+
+/* ═══ 03 · CONCEITO ════════════════════════════════════════════════ */
+.concept{ display:grid; gap:var(--space-12); }
+@media (min-width:1024px){
+  .concept{ grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); align-items:center; gap:var(--space-24); }
+}
+.frame{ position:relative; overflow:hidden; background:var(--color-bg-alt); border-radius:var(--radius); }
+.frame img{ width:100%; height:100%; object-fit:cover; }
+.js .frame img{ transform:scale(1.05); transition:transform 1.2s var(--ease-out); }
+.js .is-active .frame img{ transform:scale(1); }
+.frame--portrait{ aspect-ratio:3/4; }
+.frame--wide{ aspect-ratio:16/10; }
+.frame--square{ aspect-ratio:1/1; }
+/* Proporção nativa dos renders do catálogo (2000×1327) — sem corte */
+.frame--photo{ aspect-ratio:3/2; }
+.frame__cap{
+  margin-top:var(--space-3); font-size:var(--text-2xs); font-weight:500;
+  letter-spacing:var(--track-label); text-transform:uppercase; color:var(--color-text-faint);
+}
+
+.woods{ display:grid; gap:var(--space-6); margin-top:var(--space-12); }
+@media (min-width:640px){ .woods{ grid-template-columns:repeat(3,1fr); } }
+.wood__sw{ aspect-ratio:4/3; overflow:hidden; border-radius:var(--radius); background:var(--color-bg-alt); }
+.wood__sw img{ width:100%; height:100%; object-fit:cover; }
+.wood__n{ margin-top:var(--space-3); font-size:var(--text-base); font-weight:500; }
+.wood__s{ font-size:var(--text-sm); color:var(--color-text-faint); }
+
+/* ═══ 04 · PRODUTO ═════════════════════════════════════════════════ */
+.product{
+  display:grid; gap:var(--space-8);
+  padding:var(--space-16) 0; border-bottom:1px solid var(--color-line);
+}
+.product:last-of-type{ border-bottom:0; }
+@media (min-width:900px){
+  .product{ grid-template-columns:minmax(0,.85fr) minmax(0,1fr); gap:var(--space-16); align-items:start; }
+  .product--flip .product__media{ order:2; }
+}
+.product__i{
+  font-weight:var(--weight-display); font-size:var(--text-sm);
+  color:var(--color-accent-ink); letter-spacing:.04em;
+}
+.product__n{
+  font-weight:var(--weight-display);
+  font-size:clamp(1.4rem, .9rem + 1.8vw, 2.2rem); line-height:1.14;
+  letter-spacing:var(--track-display); margin:var(--space-2) 0 var(--space-4);
+}
+.attrs{ display:grid; gap:0; margin-top:var(--space-6); }
+@media (min-width:600px){ .attrs{ grid-template-columns:repeat(2,1fr); column-gap:var(--space-12); } }
+.attrs__row{
+  display:flex; flex-direction:column; gap:var(--space-1);
+  padding:var(--space-3) 0; border-bottom:1px solid var(--color-line);
+}
+.attrs__k{
+  font-size:var(--text-2xs); font-weight:500; letter-spacing:var(--track-label);
+  text-transform:uppercase; color:var(--color-text-faint);
+}
+.attrs__v{ font-size:var(--text-base); }
+
+.finishes{ display:grid; gap:0; margin-top:var(--space-8); }
+@media (min-width:768px){ .finishes{ grid-template-columns:repeat(2,1fr); column-gap:var(--space-16); } }
+.finishes__row{
+  display:flex; align-items:baseline; justify-content:space-between; gap:var(--space-6);
+  padding:var(--space-3) 0; border-bottom:1px solid var(--color-line);
+}
+.finishes__n{ font-size:var(--text-base); }
+.finishes__u{
+  font-size:var(--text-2xs); font-weight:500; letter-spacing:var(--track-label);
+  text-transform:uppercase; color:var(--color-text-faint); white-space:nowrap;
+}
+
+/* ═══ 05 · APLICAÇÃO ═══════════════════════════════════════════════ */
+.apply{ display:grid; gap:var(--space-12); }
+@media (min-width:1024px){
+  .apply{ grid-template-columns:minmax(0,1fr) minmax(0,1.25fr); gap:var(--space-24); align-items:start; }
+  .apply__media{ position:sticky; top:var(--pad-y); }
+  /* Alterna o lado da imagem entre os dois grupos — dá ritmo à leitura */
+  .apply--flip{ grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); }
+  .apply--flip .apply__media{ order:2; }
+}
+.system{ padding:var(--space-8) 0; border-bottom:1px solid var(--color-line-inverse); }
+.system:last-child{ border-bottom:0; }
+.system__head{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:var(--space-4); margin-bottom:var(--space-4);
+}
+.system__n{ font-size:var(--text-lg); font-weight:500; letter-spacing:.01em; }
+.system__m{
+  font-weight:var(--weight-display); font-size:var(--text-md);
+  color:var(--color-accent); font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+.system__s{
+  font-size:var(--text-2xs); font-weight:500; letter-spacing:var(--track-label);
+  text-transform:uppercase; color:var(--color-text-inverse-muted);
+  margin-bottom:var(--space-4);
+}
+.rooms{ display:flex; flex-wrap:wrap; gap:var(--space-2); }
+.rooms li{
+  display:inline-flex; align-items:baseline; gap:var(--space-2);
+  padding:var(--space-2) var(--space-3);
+  border:1px solid var(--color-line-inverse); border-radius:var(--radius);
+  font-size:var(--text-sm); color:var(--color-text-inverse-muted);
+}
+.rooms b{ font-weight:400; color:var(--color-text-inverse); }
+.rooms i{ font-style:normal; font-variant-numeric:tabular-nums; color:var(--color-accent); }
+
+/* ═══ 06 · INVESTIMENTO ════════════════════════════════════════════ */
+.ledger{ margin-top:var(--space-8); font-variant-numeric:tabular-nums; }
+.ledger caption{ text-align:left; }
+.ledger__head th{
+  position:sticky; top:0; z-index:1;
+  background:var(--color-bg);
+  padding:var(--space-3) var(--space-2);
+  font-size:var(--text-2xs); font-weight:var(--weight-label);
+  letter-spacing:var(--track-label); text-transform:uppercase; color:var(--color-text-faint);
+  border-bottom:1px solid var(--color-line-strong);
+  text-align:left;
+}
+.ledger__head th:last-child{ text-align:right; }
+
+.cat td{
+  padding:var(--space-12) var(--space-2) var(--space-3);
+  border-bottom:1px solid var(--color-line-strong);
+}
+.cat__k{
+  display:block; font-size:var(--text-2xs); font-weight:var(--weight-label);
+  letter-spacing:var(--track-label); text-transform:uppercase; color:var(--color-accent-ink);
+}
+.cat__n{
+  display:block; margin-top:var(--space-2);
+  font-weight:var(--weight-display); font-size:var(--text-lg); line-height:1.2;
+}
+.cat__s{ display:block; margin-top:var(--space-1); font-size:var(--text-sm); color:var(--color-text-faint); }
+
+.it td{ padding:var(--space-4) var(--space-2); border-bottom:1px solid var(--color-line); vertical-align:top; }
+.it{ transition:background var(--duration-fast) var(--ease-out); }
+.it:hover{ background:var(--color-bg-alt); }
+.it__n{ width:4.5rem; color:var(--color-text-faint); font-size:var(--text-sm); }
+.it__t{ display:block; font-weight:500; }
+.it__s{ display:block; margin-top:var(--space-1); font-size:var(--text-sm); color:var(--color-text-faint); }
+.it__v{ width:11rem; text-align:right; white-space:nowrap; font-weight:500; }
+
+.mid td{ padding:var(--space-3) var(--space-2); border-bottom:1px solid var(--color-line);
+         font-size:var(--text-sm); color:var(--color-text-faint); font-style:italic; }
+.mid td:last-child{ text-align:right; white-space:nowrap; font-style:normal; }
+
+.sub td{ padding:var(--space-4) var(--space-2); border-bottom:1px solid var(--color-line-strong);
+         font-size:var(--text-2xs); font-weight:var(--weight-label); letter-spacing:var(--track-label); text-transform:uppercase; }
+.sub td:last-child{ text-align:right; white-space:nowrap; letter-spacing:0; font-size:var(--text-md); }
+
+.grand{
+  display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between;
+  gap:var(--space-4); margin-top:var(--space-8);
+  padding:var(--space-6) var(--space-2); border-top:2px solid var(--color-text);
+}
+.grand__k{ font-size:var(--text-2xs); font-weight:var(--weight-label); letter-spacing:var(--track-label); text-transform:uppercase; }
+.grand__v{
+  font-weight:var(--weight-display); font-size:clamp(1.6rem, 1rem + 2.4vw, 2.8rem);
+  line-height:1; font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+.grand__v small{ font-family:var(--font-sans); font-size:.36em; font-weight:500;
+                 color:var(--color-text-faint); margin-right:.5em; letter-spacing:.06em; }
+
+/* Total corrente — orientação comercial durante a rolagem longa (apenas desktop) */
+.runner{ display:none; }
+@media (min-width:1024px){
+  .runner{
+    position:sticky; bottom:0; z-index:var(--z-sticky);
+    display:flex; align-items:center; justify-content:space-between; gap:var(--space-4);
+    padding:var(--space-3) var(--pad-x);
+    background:var(--color-bg);
+    border-top:1px solid var(--color-line-strong);
+    font-size:var(--text-2xs); font-weight:500; letter-spacing:var(--track-label); text-transform:uppercase;
+    color:var(--color-text-faint);
+  }
+  #ch-06 .wrap{ padding-bottom:calc(var(--pad-y) + 64px); }
+  .runner b{
+    font-size:var(--text-md); font-weight:var(--weight-body);
+    letter-spacing:0; text-transform:none; color:var(--color-text);
+    font-variant-numeric:tabular-nums;
+  }
+}
+
+/* Tabela → blocos empilhados no mobile (roles ARIA preservam a semântica) */
+@media (max-width:767px){
+  .ledger,.ledger tbody,.ledger tr,.ledger td{ display:block; width:auto; }
+  .ledger__head{ display:none; }
+  .it td{ border:0; padding:0; }
+  .it{ display:grid; grid-template-columns:auto 1fr; column-gap:var(--space-3);
+       padding:var(--space-4) 0; border-bottom:1px solid var(--color-line); }
+  .it__n{ grid-row:1; font-size:var(--text-sm); }
+  .it__d{ grid-row:1; }
+  .it__v{ grid-column:1/-1; grid-row:2; width:auto; text-align:left;
+          margin-top:var(--space-2); font-size:var(--text-md); }
+  .it__v::before{ content:'R$ '; color:var(--color-text-faint); font-weight:400; }
+  .cat td{ padding:var(--space-12) 0 var(--space-3); }
+  .mid{ padding:var(--space-3) 0; border-bottom:1px solid var(--color-line); }
+  .mid td{ border:0; padding:0; }
+  .mid td:last-child{ text-align:left; margin-top:var(--space-1); }
+  .sub{ display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline;
+        gap:var(--space-2); padding:var(--space-4) 0; border-bottom:1px solid var(--color-line-strong); }
+  .sub td{ border:0; padding:0; }
+  .sub td:empty{ display:none; }
+  .sub td:last-child::before{ content:'R$ '; font-size:var(--text-sm); color:var(--color-text-faint); }
+}
+
+/* ═══ 07 · CONDIÇÕES ═══════════════════════════════════════════════ */
+.terms{ display:grid; gap:0; margin-top:var(--space-8); }
+@media (min-width:768px){ .terms{ grid-template-columns:repeat(2,1fr); column-gap:var(--space-16); } }
+.terms__row{
+  display:flex; flex-direction:column; gap:var(--space-2);
+  padding:var(--space-6) 0; border-bottom:1px solid var(--color-line);
+}
+.terms__k{
+  font-size:var(--text-2xs); font-weight:var(--weight-label); letter-spacing:var(--track-label);
+  text-transform:uppercase; color:var(--color-accent-ink);
+}
+.terms__v{ font-size:var(--text-md); }
+.terms__note{ font-size:var(--text-sm); color:var(--color-text-faint); }
+
+.bank{
+  margin-top:var(--space-12); padding:var(--space-8) 0;
+  border-top:1px solid var(--color-line-strong); border-bottom:1px solid var(--color-line);
+}
+.bank__l{ font-size:var(--text-md); line-height:1.9; }
+.bank__l b{ font-weight:500; }
+.bank__e{ margin-top:var(--space-3); font-size:var(--text-sm); color:var(--color-text-faint); }
+
+/* ═══ 08 · CONFIRMAÇÃO ═════════════════════════════════════════════ */
+.close__hero{ display:flex; flex-direction:column; gap:var(--space-6); max-width:36ch; }
+.form{ display:grid; grid-template-columns:repeat(2,1fr); gap:var(--space-4); margin-top:var(--space-8); }
+.form .full{ grid-column:1/-1; }
+@media (max-width:560px){ .form{ grid-template-columns:1fr; } }
+.field{ display:flex; flex-direction:column; gap:var(--space-2); }
+.field label{
+  font-size:var(--text-2xs); font-weight:500; letter-spacing:var(--track-label);
+  text-transform:uppercase; color:var(--color-text-inverse-muted);
+}
+.field input,.field select{
+  min-height:var(--field-h); padding:var(--space-3) 0;
+  font-size:1rem;                       /* ≥16px: evita zoom automático no iOS */
+  background:transparent; color:var(--color-text-inverse);
+  border:0; border-bottom:1px solid var(--color-line-inverse);
+  border-radius:0; outline:none;
+  transition:border-color var(--duration-fast) var(--ease-out);
+}
+.field input:focus,.field select:focus{ border-color:var(--color-accent); }
+.field input::placeholder{ color:#5C574E; }
+.field select{ appearance:none; cursor:pointer; }
+.field select option{ background:var(--stone-900); color:var(--color-text-inverse); }
+
+.consent{
+  grid-column:1/-1; display:flex; align-items:flex-start; gap:var(--space-3);
+  margin-top:var(--space-4); padding:var(--space-4) 0;
+  font-size:var(--text-sm); line-height:1.6; color:var(--color-text-inverse-muted);
+  border-top:1px solid var(--color-line-inverse); cursor:pointer;
+}
+.consent input{ flex:none; margin-top:.35em; width:18px; height:18px; accent-color:var(--color-accent); }
+
+.status{ grid-column:1/-1; font-size:var(--text-sm); padding:var(--space-3) 0; }
+.status.is-err{ color:#E8A49C; }
+.status.is-err::before{ content:'⚠  '; }
+.status.is-ok{ color:#8FCBA6; }
+.status.is-ok::before{ content:'✓  '; }
+
+.done{ display:flex; flex-direction:column; gap:var(--space-4); max-width:44ch; }
+.done__mark{
+  width:48px; height:48px; display:grid; place-items:center;
+  border:1px solid var(--color-accent); border-radius:50%;
+  color:var(--color-accent); font-size:var(--text-lg);
+}
+
+/* ── Acessibilidade: movimento reduzido (obrigatório) ─────────────── */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important; animation-iteration-count:1 !important;
+    transition-duration:.01ms !important; scroll-behavior:auto !important;
+  }
+  .js .reveal{ opacity:1; transform:none; }
+  .js .frame img{ transform:none; }
+  .intro{ display:none !important; }
+}
+</style>
+</head>
+
+<body data-tone="dark">
+
+<!-- Vinheta de abertura: o vídeo já roda por baixo, então o corte revela
+     movimento em vez de começar do frame zero. -->
+<div class="intro" id="intro" aria-hidden="true">
+  <img class="intro__logo" src="logo/logo-parket.png" alt="Parket" width="668" height="374">
+  <span class="intro__line"></span>
+</div>
+
+<a class="skip" href="#ch-06">Ir direto para o investimento</a>
+
+<!-- ═══════════════ NAVEGAÇÃO ═══════════════ -->
+<nav class="rail" aria-label="Capítulos da proposta">
+  <div class="rail__brand">
+    <img class="rail__logo" src="logo/logo-parket.png" alt="Parket" width="668" height="374">
+  </div>
+
+  <ol class="rail__list" id="railList">
+    <li><a class="rail__item" href="#ch-01"><span class="rail__num">01</span><span class="rail__label">Capa</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-02"><span class="rail__num">02</span><span class="rail__label">Projeto</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-03"><span class="rail__num">03</span><span class="rail__label">Conceito</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-04"><span class="rail__num">04</span><span class="rail__label">Produto</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-05"><span class="rail__num">05</span><span class="rail__label">Aplicação</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-06"><span class="rail__num">06</span><span class="rail__label">Investimento</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-07"><span class="rail__num">07</span><span class="rail__label">Condições</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-08"><span class="rail__num">08</span><span class="rail__label">Confirmação</span><span class="rail__tick"></span></a></li>
+  </ol>
+
+  <div class="rail__foot">
+    <span class="rail__pos"><b id="railPos">01</b> / 08</span>
+    <div class="rail__bar"><i id="railBar"></i></div>
+  </div>
+</nav>
+
+<main class="deck" id="deck">
+
+<!-- ═══════════════ 01 · CAPA ═══════════════ -->
+<section class="chapter chapter--cover chapter--dark" id="ch-01" data-tone="dark" aria-label="01 Capa">
+  <div class="cover__media">
+    <video class="cover__video" id="coverVideo" autoplay loop muted playsinline
+           preload="metadata" poster="https://parket.com.br/FOTO%20HERO.jpg"
+           aria-hidden="true" tabindex="-1"></video>
+    <div class="cover__scrim"></div>
+  </div>
+
+  <div class="cover__inner">
+    <img class="cover__logo reveal" src="logo/logo-parket.png" alt="Parket" width="668" height="374">
+
+    <div class="cover__main">
+      <p class="eyebrow reveal" style="color:rgba(232,228,223,.6)">
+        <span class="eyebrow__n">01</span> Proposta comercial · 99918
+      </p>
+      <h1 class="cover__title reveal" style="margin-top:var(--space-6)">Rua Caconde<br>471</h1>
+      <p class="cover__sub reveal">Jardim Paulista · São Paulo</p>
+
+      <dl class="cover__meta reveal">
+        <div><dt>Contratante</dt><dd>Matheus de Abreu Costantini</dd></div>
+        <div><dt>Data</dt><dd>06 de agosto de 2026</dd></div>
+        <div><dt>Validade</dt><dd>30 dias</dd></div>
+      </dl>
+    </div>
+
+    <div class="cover__foot">
+      <a class="next" href="#ch-02">Iniciar <span class="next__arrow" aria-hidden="true">→</span></a>
+      <p style="font-size:var(--text-2xs);letter-spacing:var(--track-label);text-transform:uppercase;color:rgba(232,228,223,.45)">
+        Pisos, decks, forros e painéis em madeira nobre
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 02 · PROJETO ═══════════════ -->
+<section class="chapter chapter--dark" id="ch-02" data-tone="dark" aria-label="02 Projeto">
+  <div class="wrap wrap--tall">
+    <p class="eyebrow reveal"><span class="eyebrow__n">02</span> Projeto</p>
+    <h2 class="display reveal" style="margin-top:var(--space-6)">Um apartamento inteiro em madeira nobre.</h2>
+    <p class="lede reveal" style="margin-top:var(--space-6)">
+      Especificação completa para a unidade 4A: do piso ao forro, do painel de parede
+      às portas e à marcenaria fina. Uma única linguagem de material em todos os ambientes.
+    </p>
+
+    <dl class="spec reveal">
+      <div class="spec__row"><dt class="spec__k">Contratante</dt><dd class="spec__v">Matheus de Abreu Costantini</dd></div>
+      <div class="spec__row"><dt class="spec__k">Proposta</dt><dd class="spec__v">99918</dd></div>
+      <div class="spec__row"><dt class="spec__k">Endereço</dt><dd class="spec__v">Rua Caconde, 471 · 4º A</dd></div>
+      <div class="spec__row"><dt class="spec__k">Bairro</dt><dd class="spec__v">Jardim Paulista</dd></div>
+      <div class="spec__row"><dt class="spec__k">Cidade</dt><dd class="spec__v">São Paulo · SP</dd></div>
+      <div class="spec__row"><dt class="spec__k">Data</dt><dd class="spec__v">06 de agosto de 2026</dd></div>
+      <div class="spec__row"><dt class="spec__k">Validade</dt><dd class="spec__v">30 dias</dd></div>
+      <div class="spec__row"><dt class="spec__k">Consultor</dt><dd class="spec__v">A definir</dd></div>
+      <div class="spec__row"><dt class="spec__k">Garantia</dt><dd class="spec__v">10 anos</dd></div>
+    </dl>
+
+    <div class="figures reveal">
+      <div><p class="figures__n">300<small style="font-size:.42em"> m²</small></p><p class="figures__l">Revestimento em madeira</p></div>
+      <div><p class="figures__n">32</p><p class="figures__l">Portas</p></div>
+      <div><p class="figures__n">35</p><p class="figures__l">Peças de marcenaria</p></div>
+    </div>
+
+    <a class="next reveal" href="#ch-03" style="margin-top:var(--space-12)">Conceito <span class="next__arrow" aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<!-- ═══════════════ 03 · CONCEITO ═══════════════ -->
+<section class="chapter" id="ch-03" data-tone="paper" aria-label="03 Conceito">
+  <div class="wrap">
+    <p class="eyebrow reveal"><span class="eyebrow__n">03</span> Conceito</p>
+
+    <div class="concept" style="margin-top:var(--space-8)">
+      <div>
+        <h2 class="display reveal">Três madeiras, um só projeto.</h2>
+        <p class="lede reveal" style="margin-top:var(--space-6)">
+          A especificação parte de uma paleta contínua. O Carvalho Europeu Naturalle atravessa
+          o apartamento no piso, no rodapé, nos painéis e nas portas. O Tauari Naturalle ripado
+          resolve os forros das áreas sociais. O Carvalho Smoked escurece a marcenaria fina,
+          criando profundidade sem romper a leitura do conjunto.
+        </p>
+        <p class="body reveal" style="margin-top:var(--space-6)">
+          Laca, MDF e alumínio ficam onde a madeira não deve aparecer: áreas de serviço,
+          roupeiros internos e ambientes molhados. Cada aplicação inclui insumos,
+          instalação e gestão de obras.
+        </p>
+      </div>
+
+      <figure class="reveal">
+        <div class="frame frame--photo">
+          <img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-16.jpg"
+               srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-16-768x510.jpg 768w,
+                       https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-16-1024x679.jpg 1024w,
+                       https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-16-1536x1019.jpg 1536w,
+                       https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-16.jpg 2000w"
+               sizes="(min-width:1024px) 34vw, 92vw"
+               alt="Interior residencial com piso em carvalho" loading="lazy" decoding="async"
+               width="2000" height="1327">
+        </div>
+        <figcaption class="frame__cap">Projeto Parket · piso em carvalho</figcaption>
+      </figure>
+    </div>
+
+    <div class="woods reveal">
+      <!-- Trio de referência de aplicação (fotografia Parket). Para trocar por
+           fotos do projeto do cliente, substitua apenas o src de cada figure. -->
+      <figure>
+        <div class="wood__sw"><img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-25.jpg"
+          srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-25-768x510.jpg 768w,
+                  https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-25-1024x679.jpg 1024w,
+                  https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-25-1536x1019.jpg 1536w"
+          sizes="(min-width:1024px) 23vw, (min-width:640px) 30vw, 92vw"
+          alt="Suíte com piso em carvalho" loading="lazy" decoding="async" width="2000" height="1327"></div>
+        <figcaption><span class="wood__n">Piso e rodapé</span><br><span class="wood__s">Carvalho Europeu Naturalle</span></figcaption>
+      </figure>
+      <figure>
+        <div class="wood__sw"><img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-04.jpg"
+          srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-04-768x510.jpg 768w,
+                  https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-04-1024x679.jpg 1024w,
+                  https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-04-1536x1019.jpg 1536w"
+          sizes="(min-width:1024px) 23vw, (min-width:640px) 30vw, 92vw"
+          alt="Forro ripado em madeira" loading="lazy" decoding="async" width="2000" height="1327"></div>
+        <figcaption><span class="wood__n">Forro</span><br><span class="wood__s">Ripado Tauari Naturalle</span></figcaption>
+      </figure>
+      <figure>
+        <div class="wood__sw"><img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-06.jpg"
+          srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-06-768x510.jpg 768w,
+                  https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-06-1024x679.jpg 1024w,
+                  https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-06-1536x1019.jpg 1536w"
+          sizes="(min-width:1024px) 23vw, (min-width:640px) 30vw, 92vw"
+          alt="Marcenaria em lâmina de madeira" loading="lazy" decoding="async" width="2000" height="1327"></div>
+        <figcaption><span class="wood__n">Marcenaria</span><br><span class="wood__s">Lâmina Carvalho Smoked</span></figcaption>
+      </figure>
+    </div>
+
+    <a class="next reveal" href="#ch-04" style="margin-top:var(--space-16)">Produto <span class="next__arrow" aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<!-- ═══════════════ 04 · PRODUTO ═══════════════ -->
+<section class="chapter" id="ch-04" data-tone="paper" aria-label="04 Produto">
+  <div class="wrap">
+    <p class="eyebrow reveal"><span class="eyebrow__n">04</span> Produto</p>
+    <h2 class="display display--sm reveal" style="margin-top:var(--space-6)">Especificação técnica</h2>
+
+    <article class="product">
+      <figure class="product__media">
+        <div class="frame frame--photo">
+          <img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-01.jpg"
+               srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-01-768x510.jpg 768w,
+                       https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-01-1024x679.jpg 1024w,
+                       https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-01-1536x1019.jpg 1536w"
+               sizes="(min-width:1024px) 32vw, (min-width:900px) 40vw, 92vw"
+               alt="Piso em Carvalho Europeu Naturalle aplicado" loading="lazy" decoding="async"
+               width="2000" height="1327">
+        </div>
+      </figure>
+      <div>
+        <p class="product__i">01</p>
+        <h3 class="product__n">Carvalho Europeu Naturalle</h3>
+        <p class="body">Madeira de folhosa europeia de veio calmo e tom claro uniforme. Aplicada no piso,
+          no rodapé, nos painéis de parede e nas folhas de porta. É o material que dá continuidade ao projeto.</p>
+        <dl class="attrs">
+          <div class="attrs__row"><dt class="attrs__k">Dimensões · piso</dt><dd class="attrs__v">15/3 × 19 × 190 cm</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Padrão</dt><dd class="attrs__v">Régua longa</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Acabamento</dt><dd class="attrs__v">Naturalle</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Aplicações</dt><dd class="attrs__v">Piso · rodapé · painel · porta</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Perda técnica</dt><dd class="attrs__v">10% sobre a metragem real</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Garantia</dt><dd class="attrs__v">10 anos</dd></div>
+        </dl>
+      </div>
+    </article>
+
+    <article class="product product--flip">
+      <figure class="product__media">
+        <div class="frame frame--photo">
+          <img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-05.jpg"
+               srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-05-768x510.jpg 768w,
+                       https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-05-1024x679.jpg 1024w,
+                       https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-05-1536x1019.jpg 1536w"
+               sizes="(min-width:1024px) 32vw, (min-width:900px) 40vw, 92vw"
+               alt="Forro ripado em Tauari Naturalle" loading="lazy" decoding="async"
+               width="2000" height="1327">
+        </div>
+      </figure>
+      <div>
+        <p class="product__i">02</p>
+        <h3 class="product__n">Tauari Naturalle ripado</h3>
+        <p class="body">Ripado de Tauari com bunha de 0,5 cm e comprimento variável, aplicado nos forros
+          das áreas sociais. O ritmo das ripas dá escala ao pé-direito sem competir com o piso.</p>
+        <dl class="attrs">
+          <div class="attrs__row"><dt class="attrs__k">Dimensões</dt><dd class="attrs__v">1,8 × 3,5 cm · bunha 0,5 cm</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Comprimento</dt><dd class="attrs__v">Variável</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Acabamento</dt><dd class="attrs__v">Naturalle</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Aplicação</dt><dd class="attrs__v">Forro</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Área</dt><dd class="attrs__v">116 m² reais · 128 m² com perda</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Garantia</dt><dd class="attrs__v">10 anos</dd></div>
+        </dl>
+      </div>
+    </article>
+
+    <article class="product">
+      <figure class="product__media">
+        <div class="frame frame--photo">
+          <img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-12.jpg"
+               srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-12-768x510.jpg 768w,
+                       https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-12-1024x679.jpg 1024w,
+                       https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-12-1536x1019.jpg 1536w"
+               sizes="(min-width:1024px) 32vw, (min-width:900px) 40vw, 92vw"
+               alt="Marcenaria fina em lâmina de carvalho" loading="lazy" decoding="async"
+               width="2000" height="1327">
+        </div>
+      </figure>
+      <div>
+        <p class="product__i">03</p>
+        <h3 class="product__n">Lâmina Carvalho Smoked</h3>
+        <p class="body">Lâmina de carvalho com tratamento fumê, mais escura e de veio marcado.
+          Reservada à marcenaria fina: estantes, buffets, gabinetes e mesas de cabeceira.</p>
+        <dl class="attrs">
+          <div class="attrs__row"><dt class="attrs__k">Tipo</dt><dd class="attrs__v">Lâmina natural</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Acabamento</dt><dd class="attrs__v">Smoked</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Aplicação</dt><dd class="attrs__v">Marcenaria fina</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Peças</dt><dd class="attrs__v">16 itens especificados</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Execução</dt><dd class="attrs__v">Sob medida</dd></div>
+          <div class="attrs__row"><dt class="attrs__k">Garantia</dt><dd class="attrs__v">10 anos</dd></div>
+        </dl>
+      </div>
+    </article>
+
+    <div style="margin-top:var(--space-16)">
+      <div class="section-head"><span>Acabamentos complementares</span><span>07</span></div>
+      <div class="finishes">
+        <div class="finishes__row"><span class="finishes__n">Lâmina Carvalho Naturalle</span><span class="finishes__u">Marcenaria · copa</span></div>
+        <div class="finishes__row"><span class="finishes__n">Laca</span><span class="finishes__u">Portas · painel</span></div>
+        <div class="finishes__row"><span class="finishes__n">Lâmina laca / MDF Branco Diamante</span><span class="finishes__u">Roupeiros · armários</span></div>
+        <div class="finishes__row"><span class="finishes__n">MDF Ultra Branco Diamante Duratex</span><span class="finishes__u">Despensa · lavanderia</span></div>
+        <div class="finishes__row"><span class="finishes__n">MDF Ultra Cru</span><span class="finishes__u">Painéis de cabeceira</span></div>
+        <div class="finishes__row"><span class="finishes__n">MDF Branco Diamante</span><span class="finishes__u">Dormitório de serviço</span></div>
+        <div class="finishes__row"><span class="finishes__n">Alumínio · vidro canelado</span><span class="finishes__u">Portas de passagem</span></div>
+      </div>
+    </div>
+
+    <a class="next reveal" href="#ch-05" style="margin-top:var(--space-16)">Aplicação <span class="next__arrow" aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<!-- ═══════════════ 05 · APLICAÇÃO ═══════════════ -->
+<section class="chapter chapter--dark" id="ch-05" data-tone="dark" aria-label="05 Aplicação">
+  <div class="wrap">
+    <p class="eyebrow reveal"><span class="eyebrow__n">05</span> Aplicação</p>
+
+    <h2 class="display display--sm reveal" style="margin-top:var(--space-6)">Onde cada sistema entra</h2>
+    <p class="lede reveal" style="margin-top:var(--space-4)">
+      Os dois grupos comerciais da proposta. Metragens reais; a perda técnica de 10%
+      está considerada no investimento.
+    </p>
+
+    <!-- ── Grupo A · Aplicações ─────────────────────────────────────── -->
+    <div class="section-head" style="margin-top:var(--space-16)">
+      <span>A · Aplicações</span><span>Piso · rodapé · forro</span>
+    </div>
+
+    <div class="apply" style="margin-top:var(--space-8)">
+      <div class="apply__media reveal">
+        <figure>
+          <div class="frame frame--photo">
+            <img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-13.jpg"
+                 srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-13-768x510.jpg 768w,
+                         https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-13-1024x679.jpg 1024w,
+                         https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-13-1536x1019.jpg 1536w"
+                 sizes="(min-width:1024px) 30vw, 92vw"
+                 alt="Ambiente com piso e forro em madeira" loading="lazy" decoding="async"
+                 width="2000" height="1327">
+          </div>
+          <figcaption class="frame__cap" style="color:var(--color-text-inverse-muted)">Piso e forro em madeira</figcaption>
+        </figure>
+      </div>
+
+      <div>
+        <div class="system">
+          <div class="system__head"><h3 class="system__n">Piso</h3><span class="system__m">98 m²</span></div>
+          <p class="system__s">Carvalho Europeu Naturalle · 15/3 × 19 × 190 cm</p>
+          <ul class="rooms">
+            <li><b>Circulação íntima</b> <i>9 m²</i></li>
+            <li><b>Suíte master + closet</b> <i>27 m²</i></li>
+            <li><b>Suíte 1</b> <i>15 m²</i></li>
+            <li><b>Suíte 2</b> <i>18 m²</i></li>
+            <li><b>Suíte 3</b> <i>16 m²</i></li>
+            <li><b>Circulação</b> <i>13 m²</i></li>
+          </ul>
+        </div>
+
+        <div class="system">
+          <div class="system__head"><h3 class="system__n">Rodapé</h3><span class="system__m">17 ml</span></div>
+          <p class="system__s">Carvalho Europeu Naturalle</p>
+          <ul class="rooms">
+            <li><b>Circulação íntima + suítes master, closet, 1, 2 e 3</b></li>
+          </ul>
+        </div>
+
+        <div class="system">
+          <div class="system__head"><h3 class="system__n">Forro</h3><span class="system__m">116 m²</span></div>
+          <p class="system__s">Ripado Tauari Naturalle · 1,8 × 3,5 cm</p>
+          <ul class="rooms">
+            <li><b>Home</b> <i>30 m²</i></li>
+            <li><b>Living</b> <i>36 m²</i></li>
+            <li><b>Hall de entrada + hall social</b> <i>20 m²</i></li>
+            <li><b>Sala de jantar + lavabo</b> <i>30 m²</i></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Grupo B · Marcenaria fina ────────────────────────────────── -->
+    <div class="section-head" style="margin-top:var(--space-24)">
+      <span>B · Marcenaria fina</span><span>Painel · porta · marcenaria</span>
+    </div>
+
+    <div class="apply apply--flip" style="margin-top:var(--space-8)">
+      <div class="apply__media reveal">
+        <figure>
+          <div class="frame frame--photo">
+            <img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_PO-04.jpg"
+                 srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_PO-04-768x510.jpg 768w,
+                         https://parket.com.br/wp-content/uploads/2025/10/PRO_PO-04-1024x679.jpg 1024w,
+                         https://parket.com.br/wp-content/uploads/2025/10/PRO_PO-04-1536x1019.jpg 1536w"
+                 sizes="(min-width:1024px) 30vw, 92vw"
+                 alt="Portas e marcenaria em madeira" loading="lazy" decoding="async"
+                 width="2000" height="1327">
+          </div>
+          <figcaption class="frame__cap" style="color:var(--color-text-inverse-muted)">Portas e marcenaria sob medida</figcaption>
+        </figure>
+      </div>
+
+      <div>
+        <div class="system">
+          <div class="system__head"><h3 class="system__n">Painel</h3><span class="system__m">86 m²</span></div>
+          <p class="system__s">Lâmina Carvalho Europeu Naturalle</p>
+          <ul class="rooms">
+            <li><b>Sala de jantar</b> <i>33 m²</i></li>
+            <li><b>Living + varanda</b> <i>16 m²</i></li>
+            <li><b>Hall de entrada</b> <i>25 m²</i></li>
+            <li><b>Suíte master</b> <i>12 m²</i></li>
+          </ul>
+        </div>
+
+        <div class="system">
+          <div class="system__head"><h3 class="system__n">Portas</h3><span class="system__m">32 un</span></div>
+          <p class="system__s">Camarão · correr · pivotante · passagem</p>
+          <ul class="rooms">
+            <li><b>Laca</b> <i>18 un</i></li>
+            <li><b>Lâmina Carvalho Europeu</b> <i>11 un</i></li>
+            <li><b>Alumínio + vidro</b> <i>3 un</i></li>
+          </ul>
+        </div>
+
+        <div class="system">
+          <div class="system__head"><h3 class="system__n">Marcenaria</h3><span class="system__m">35 peças</span></div>
+          <p class="system__s">Carvalho Smoked · Carvalho Naturalle · laca · MDF</p>
+          <ul class="rooms">
+            <li><b>Estantes e painéis</b> <i>10</i></li>
+            <li><b>Gabinetes de banho</b> <i>4</i></li>
+            <li><b>Roupeiros e armários</b> <i>9</i></li>
+            <li><b>Cozinha e copa</b> <i>4</i></li>
+            <li><b>Cabeceiras e apoios</b> <i>8</i></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <a class="next reveal" href="#ch-06" style="margin-top:var(--space-16)">Investimento <span class="next__arrow" aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<!-- ═══════════════ 06 · INVESTIMENTO ═══════════════ -->
+<section class="chapter" id="ch-06" data-tone="paper" aria-label="06 Investimento">
+  <div class="wrap">
+    <p class="eyebrow reveal"><span class="eyebrow__n">06</span> Investimento</p>
+    <h2 class="display display--sm reveal" style="margin-top:var(--space-6)">Composição do investimento</h2>
+    <p class="lede reveal" style="margin-top:var(--space-4)">
+      Proposta 99918 · Matheus de Abreu Costantini. Valores em reais, com insumos,
+      instalação e gestão de obras inclusos em cada sistema.
+    </p>
+
+    <!-- ── Grupo A · Aplicações ── -->
+    <div class="section-head" style="margin-top:var(--space-16)">
+      <span>A · Aplicações</span><span>Piso · rodapé · forro</span>
+    </div>
+    <table class="ledger" role="table">
+      <caption class="sr-only">Grupo A · Aplicações · piso, rodapé e forro</caption>
+      <thead class="ledger__head"><tr><th scope="col">Item</th><th scope="col">Descritivo</th><th scope="col">Valor (R$)</th></tr></thead>
+      <tbody>
+        <tr class="cat" role="row"><td colspan="3" role="cell">
+          <span class="cat__k">Piso</span>
+          <span class="cat__n">Carvalho Europeu Naturalle</span>
+          <span class="cat__s">15/3 × 19 × 190 cm</span>
+        </td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">1.1</td><td class="it__d" role="cell"><span class="it__t">Circulação íntima</span><span class="it__s">9 m² reais + 10% de perda = 10 m²</span></td><td class="it__v" role="cell">10.336,20</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">1.2</td><td class="it__d" role="cell"><span class="it__t">Suíte master + closet</span><span class="it__s">27 m² reais + 10% de perda = 30 m²</span></td><td class="it__v" role="cell">31.008,60</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">1.3</td><td class="it__d" role="cell"><span class="it__t">Suíte 1</span><span class="it__s">15 m² reais + 10% de perda = 17 m²</span></td><td class="it__v" role="cell">17.571,54</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">1.4</td><td class="it__d" role="cell"><span class="it__t">Suíte 2</span><span class="it__s">18 m² reais + 10% de perda = 20 m²</span></td><td class="it__v" role="cell">20.672,40</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">1.5</td><td class="it__d" role="cell"><span class="it__t">Suíte 3</span><span class="it__s">16 m² reais + 10% de perda = 18 m²</span></td><td class="it__v" role="cell">18.605,16</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">1.6</td><td class="it__d" role="cell"><span class="it__t">Circulação</span><span class="it__s">13 m² reais + 10% de perda = 15 m²</span></td><td class="it__v" role="cell">15.504,30</td></tr>
+        <tr class="mid" role="row"><td role="cell"></td><td role="cell">Metragem real total 98 m² + 10% de perda = 110 m²</td><td role="cell">113.698,20</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">1.7</td><td class="it__d" role="cell"><span class="it__t">Insumos</span></td><td class="it__v" role="cell">12.994,08</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">1.8</td><td class="it__d" role="cell"><span class="it__t">Instalação e gestão de obras</span></td><td class="it__v" role="cell">35.733,72</td></tr>
+        <tr class="sub" role="row"><td role="cell"></td><td role="cell">Parcial · Piso</td><td role="cell">162.426,00</td></tr>
+
+        <tr class="cat" role="row"><td colspan="3" role="cell">
+          <span class="cat__k">Rodapé</span>
+          <span class="cat__n">Carvalho Europeu Naturalle</span>
+        </td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">2.1</td><td class="it__d" role="cell"><span class="it__t">Circulação íntima + suítes master, closet, 1, 2 e 3</span><span class="it__s">Metragem real 17 ml</span></td><td class="it__v" role="cell">18.122,65</td></tr>
+        <tr class="sub" role="row"><td role="cell"></td><td role="cell">Parcial · Rodapé</td><td role="cell">18.122,65</td></tr>
+
+        <tr class="cat" role="row"><td colspan="3" role="cell">
+          <span class="cat__k">Forro</span>
+          <span class="cat__n">Ripado Tauari Naturalle</span>
+          <span class="cat__s">1,8 × 3,5 cm (bunha 0,5) × comprimento variável</span>
+        </td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">4.1</td><td class="it__d" role="cell"><span class="it__t">Home</span><span class="it__s">30 m² reais + 10% de perda = 33 m²</span></td><td class="it__v" role="cell">28.116,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">4.2</td><td class="it__d" role="cell"><span class="it__t">Living</span><span class="it__s">36 m² reais + 10% de perda = 40 m²</span></td><td class="it__v" role="cell">34.080,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">4.3</td><td class="it__d" role="cell"><span class="it__t">Hall de entrada + hall social</span><span class="it__s">20 m² reais + 10% de perda = 22 m²</span></td><td class="it__v" role="cell">18.744,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">4.4</td><td class="it__d" role="cell"><span class="it__t">Sala de jantar + lavabo</span><span class="it__s">30 m² reais + 10% de perda = 33 m²</span></td><td class="it__v" role="cell">28.116,00</td></tr>
+        <tr class="mid" role="row"><td role="cell"></td><td role="cell">Metragem real total 116 m² + 10% de perda = 128 m²</td><td role="cell">109.056,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">4.5</td><td class="it__d" role="cell"><span class="it__t">Insumos</span></td><td class="it__v" role="cell">21.811,20</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">4.6</td><td class="it__d" role="cell"><span class="it__t">Instalação e gestão de obras</span></td><td class="it__v" role="cell">50.892,80</td></tr>
+        <tr class="sub" role="row"><td role="cell"></td><td role="cell">Parcial · Forro</td><td role="cell">181.760,00</td></tr>
+      </tbody>
+    </table>
+
+    <div class="grand">
+      <span class="grand__k">Subtotal · Aplicações</span>
+      <span class="grand__v"><small>R$</small>362.308,65</span>
+    </div>
+
+    <!-- ── Grupo B · Marcenaria fina ── -->
+    <div class="section-head" style="margin-top:var(--space-24)">
+      <span>B · Marcenaria fina</span><span>Painel · porta · marcenaria</span>
+    </div>
+    <table class="ledger" role="table">
+      <caption class="sr-only">Grupo B · Marcenaria fina · painel, porta e marcenaria</caption>
+      <thead class="ledger__head"><tr><th scope="col">Item</th><th scope="col">Descritivo</th><th scope="col">Valor (R$)</th></tr></thead>
+      <tbody>
+        <tr class="cat" role="row"><td colspan="3" role="cell">
+          <span class="cat__k">Painel</span><span class="cat__n">Lâmina Carvalho Europeu Naturalle</span>
+        </td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">3.1</td><td class="it__d" role="cell"><span class="it__t">Sala de jantar</span><span class="it__s">Altura 2,64 m · 33 m² reais + 10% = 37 m²</span></td><td class="it__v" role="cell">49.284,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">3.2</td><td class="it__d" role="cell"><span class="it__t">Living + varanda</span><span class="it__s">Altura 2,64 m · 16 m² reais + 10% = 18 m²</span></td><td class="it__v" role="cell">23.976,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">3.3</td><td class="it__d" role="cell"><span class="it__t">Hall de entrada</span><span class="it__s">Altura 2,60 m · 25 m² reais + 10% = 28 m²</span></td><td class="it__v" role="cell">37.296,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">3.4</td><td class="it__d" role="cell"><span class="it__t">Suíte master</span><span class="it__s">Altura 2,60 m · 12 m² reais + 10% = 14 m²</span></td><td class="it__v" role="cell">18.648,00</td></tr>
+        <tr class="mid" role="row"><td role="cell"></td><td role="cell">Metragem real total 86 m² + 10% de perda = 97 m²</td><td role="cell">129.204,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">3.5</td><td class="it__d" role="cell"><span class="it__t">Insumos</span></td><td class="it__v" role="cell">25.840,80</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">3.6</td><td class="it__d" role="cell"><span class="it__t">Instalação e gestão de obras</span></td><td class="it__v" role="cell">60.295,20</td></tr>
+        <tr class="sub" role="row"><td role="cell"></td><td role="cell">Parcial · Painel</td><td role="cell">215.340,00</td></tr>
+
+        <tr class="cat" role="row"><td colspan="3" role="cell">
+          <span class="cat__k">Porta</span><span class="cat__n">Camarão, correr, passagem e pivotante</span>
+          <span class="cat__s">Laca · lâmina Carvalho Europeu Naturalle · alumínio</span>
+        </td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.1</td><td class="it__d" role="cell"><span class="it__t">Living · camarão laca</span><span class="it__s">01 porta de 4 folhas · 3,40 × 2,65 m · 18,20 m²</span></td><td class="it__v" role="cell">82.264,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.2</td><td class="it__d" role="cell"><span class="it__t">Closet / banho master · correr laca</span><span class="it__s">01 porta · 0,90 × 2,65 m · 4,50 m²</span></td><td class="it__v" role="cell">20.340,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.3</td><td class="it__d" role="cell"><span class="it__t">Suíte 02 · correr laca</span><span class="it__s">01 porta · puxador cava · 0,90 × 2,60 m · 5,00 m²</span></td><td class="it__v" role="cell">22.600,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.4</td><td class="it__d" role="cell"><span class="it__t">Escritório / living · correr laca</span><span class="it__s">04 portas · 4 folhas móveis + 2 fixas · 5,99 × 2,65 m · 31,80 m²</span></td><td class="it__v" role="cell">143.736,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.5</td><td class="it__d" role="cell"><span class="it__t">Closet master / suíte master · correr lâmina</span><span class="it__s">01 porta · 0,90 × 2,50 m · 4,50 m²</span></td><td class="it__v" role="cell">20.070,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.6</td><td class="it__d" role="cell"><span class="it__t">Suíte 02 · correr lâmina</span><span class="it__s">01 porta · puxador cava · 0,90 × 2,60 m · 5,00 m²</span></td><td class="it__v" role="cell">22.300,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.7</td><td class="it__d" role="cell"><span class="it__t">Despensa · passagem alumínio</span><span class="it__s">02 portas de giro · 2 folhas · vidro incolor canelado · 0,84 × 2,60 m · 4,50 m²</span></td><td class="it__v" role="cell">48.770,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.8</td><td class="it__d" role="cell"><span class="it__t">Cozinha / área de serviço · passagem alumínio</span><span class="it__s">01 porta de giro · veneziana em alumínio + vidro · 0,87 × 2,60 m · 4,50 m²</span></td><td class="it__v" role="cell">49.890,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.9</td><td class="it__d" role="cell"><span class="it__t">Área de serviço / circulação · pivotante laca</span><span class="it__s">02 portas · 0,89 × 2,59 m · 9,10 m²</span></td><td class="it__v" role="cell">41.132,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.10</td><td class="it__d" role="cell"><span class="it__t">Dorm. serviço 1 e 2 · pivotante laca</span><span class="it__s">02 portas · 0,88 × 2,14 m · 7,30 m²</span></td><td class="it__v" role="cell">32.996,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.11</td><td class="it__d" role="cell"><span class="it__t">Banho suíte 1 e 2 · pivotante laca</span><span class="it__s">03 portas · 0,89 × 2,59 m · 13,60 m²</span></td><td class="it__v" role="cell">61.472,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.12</td><td class="it__d" role="cell"><span class="it__t">Suíte 01 e 02 · pivotante laca</span><span class="it__s">04 portas · 0,89 × 2,30 m · 16,40 m²</span></td><td class="it__v" role="cell">74.128,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.13</td><td class="it__d" role="cell"><span class="it__t">Banho de serviço · pivotante laca</span><span class="it__s">01 porta · 0,85 × 2,15 m · 3,60 m²</span></td><td class="it__v" role="cell">16.272,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.14</td><td class="it__d" role="cell"><span class="it__t">Hall íntimo · pivotante laca</span><span class="it__s">01 porta · 0,87 × 2,30 m · 4,50 m²</span></td><td class="it__v" role="cell">20.340,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.15</td><td class="it__d" role="cell"><span class="it__t">Copa / jantar · pivotante lâmina</span><span class="it__s">01 porta · 0,97 × 2,50 m · 4,50 m²</span></td><td class="it__v" role="cell">20.070,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.16</td><td class="it__d" role="cell"><span class="it__t">Hall / copa · pivotante lâmina</span><span class="it__s">01 porta · 0,87 × 2,59 m · 4,50 m²</span></td><td class="it__v" role="cell">20.070,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.17</td><td class="it__d" role="cell"><span class="it__t">Cozinha / copa · pivotante lâmina</span><span class="it__s">01 porta · 0,87 × 2,59 m · 4,50 m²</span></td><td class="it__v" role="cell">20.070,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.18</td><td class="it__d" role="cell"><span class="it__t">Hall / circulação · pivotante lâmina</span><span class="it__s">02 portas · 2 folhas · 1,40 × 2,59 m · 7,30 m²</span></td><td class="it__v" role="cell">32.558,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.19</td><td class="it__d" role="cell"><span class="it__t">Área técnica · pivotante lâmina</span><span class="it__s">01 porta · 0,70 × 2,50 m · 3,60 m²</span></td><td class="it__v" role="cell">16.056,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">5.20</td><td class="it__d" role="cell"><span class="it__t">Lavabo · pivotante lâmina</span><span class="it__s">01 porta · 0,94 × 2,59 m · 4,50 m²</span></td><td class="it__v" role="cell">20.070,00</td></tr>
+        <tr class="sub" role="row"><td role="cell"></td><td role="cell">Parcial · Porta</td><td role="cell">785.204,00</td></tr>
+
+        <tr class="cat" role="row"><td colspan="3" role="cell">
+          <span class="cat__k">Marcenaria</span><span class="cat__n">Lâmina Carvalho Smoked</span>
+        </td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.1</td><td class="it__d" role="cell"><span class="it__t">Home</span><span class="it__s">Estante piso/teto</span></td><td class="it__v" role="cell">107.500,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.2</td><td class="it__d" role="cell"><span class="it__t">Living</span><span class="it__s">Estante curva orgânica · confirmar profundidade</span></td><td class="it__v" role="cell">14.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.3</td><td class="it__d" role="cell"><span class="it__t">Sala de jantar</span><span class="it__s">Buffet</span></td><td class="it__v" role="cell">52.500,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.4</td><td class="it__d" role="cell"><span class="it__t">Banho suíte 1</span><span class="it__s">Gabinete</span></td><td class="it__v" role="cell">127.500,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.5</td><td class="it__d" role="cell"><span class="it__t">Banho suíte master</span><span class="it__s">Gabinete</span></td><td class="it__v" role="cell">184.770,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.6</td><td class="it__d" role="cell"><span class="it__t">Cozinha</span><span class="it__s">Torre quente</span></td><td class="it__v" role="cell">48.500,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.7</td><td class="it__d" role="cell"><span class="it__t">Cozinha</span><span class="it__s">Gabinete em U</span></td><td class="it__v" role="cell">16.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.8</td><td class="it__d" role="cell"><span class="it__t">Cozinha</span><span class="it__s">Suspenso vista 04</span></td><td class="it__v" role="cell">22.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.9</td><td class="it__d" role="cell"><span class="it__t">Banho suíte 2</span><span class="it__s">Gabinete</span></td><td class="it__v" role="cell">80.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.10</td><td class="it__d" role="cell"><span class="it__t">Banho suíte 3</span><span class="it__s">Gabinete</span></td><td class="it__v" role="cell">110.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.11</td><td class="it__d" role="cell"><span class="it__t">Escritório</span><span class="it__s">Estante piso/teto</span></td><td class="it__v" role="cell">18.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.12</td><td class="it__d" role="cell"><span class="it__t">Suítes 01, 02 e 03</span><span class="it__s">05 mesas de cabeceira</span></td><td class="it__v" role="cell">100.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.13</td><td class="it__d" role="cell"><span class="it__t">Suítes 02 e 03</span><span class="it__s">02 gaveteiros</span></td><td class="it__v" role="cell">24.500,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.14</td><td class="it__d" role="cell"><span class="it__t">Suíte 2</span><span class="it__s">Estante piso/teto</span></td><td class="it__v" role="cell">45.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.15</td><td class="it__d" role="cell"><span class="it__t">Suíte 3</span><span class="it__s">Estante piso/teto</span></td><td class="it__v" role="cell">51.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">6.16</td><td class="it__d" role="cell"><span class="it__t">Suíte master</span><span class="it__s">Móvel suspenso 6,4 m² + 02 mesinhas laterais 15 m²</span></td><td class="it__v" role="cell">39.000,00</td></tr>
+        <tr class="sub" role="row"><td role="cell"></td><td role="cell">Parcial · Carvalho Smoked</td><td role="cell">1.040.270,00</td></tr>
+
+        <tr class="cat" role="row"><td colspan="3" role="cell">
+          <span class="cat__k">Marcenaria</span><span class="cat__n">Lâmina laca / MDF Branco Diamante</span>
+        </td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">7.1</td><td class="it__d" role="cell"><span class="it__t">Circulação</span><span class="it__s">Armário 01</span></td><td class="it__v" role="cell">54.250,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">7.2</td><td class="it__d" role="cell"><span class="it__t">Circulação</span><span class="it__s">Armário 02</span></td><td class="it__v" role="cell">54.250,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">7.3</td><td class="it__d" role="cell"><span class="it__t">Circulação</span><span class="it__s">Armário 03</span></td><td class="it__v" role="cell">54.249,99</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">7.4</td><td class="it__d" role="cell"><span class="it__t">Suíte 02</span><span class="it__s">Roupeiro</span></td><td class="it__v" role="cell">80.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">7.5</td><td class="it__d" role="cell"><span class="it__t">Suíte 01</span><span class="it__s">Roupeiro</span></td><td class="it__v" role="cell">80.000,01</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">7.6</td><td class="it__d" role="cell"><span class="it__t">Suíte 03</span><span class="it__s">Roupeiro</span></td><td class="it__v" role="cell">80.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">7.7</td><td class="it__d" role="cell"><span class="it__t">Closet</span><span class="it__s">Roupeiro 01</span></td><td class="it__v" role="cell">135.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">7.8</td><td class="it__d" role="cell"><span class="it__t">Closet</span><span class="it__s">Roupeiro 02</span></td><td class="it__v" role="cell">145.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">7.9</td><td class="it__d" role="cell"><span class="it__t">Closet</span><span class="it__s">Roupeiro 03</span></td><td class="it__v" role="cell">140.000,00</td></tr>
+        <tr class="sub" role="row"><td role="cell"></td><td role="cell">Parcial · Laca / MDF Branco Diamante</td><td role="cell">822.750,00</td></tr>
+
+        <tr class="cat" role="row"><td colspan="3" role="cell">
+          <span class="cat__k">Marcenaria</span><span class="cat__n">MDF Ultra Branco Diamante Duratex</span>
+        </td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">8.1</td><td class="it__d" role="cell"><span class="it__t">Despensa</span><span class="it__s">04 prateleiras</span></td><td class="it__v" role="cell">17.800,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">8.2</td><td class="it__d" role="cell"><span class="it__t">Lavanderia</span><span class="it__s">MDF resistente à água</span></td><td class="it__v" role="cell">47.350,00</td></tr>
+        <tr class="sub" role="row"><td role="cell"></td><td role="cell">Parcial · MDF Ultra Branco Diamante</td><td role="cell">65.150,00</td></tr>
+
+        <tr class="cat" role="row"><td colspan="3" role="cell">
+          <span class="cat__k">Marcenaria</span><span class="cat__n">Lâmina painel laca</span>
+        </td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">9.1</td><td class="it__d" role="cell"><span class="it__t">Suíte 01</span><span class="it__s">Painel laca</span></td><td class="it__v" role="cell">12.665,00</td></tr>
+        <tr class="sub" role="row"><td role="cell"></td><td role="cell">Parcial · Painel laca</td><td role="cell">12.665,00</td></tr>
+
+        <tr class="cat" role="row"><td colspan="3" role="cell">
+          <span class="cat__k">Marcenaria</span><span class="cat__n">Lâmina MDF Ultra Cru</span>
+        </td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">10.1</td><td class="it__d" role="cell"><span class="it__t">Suíte 2</span><span class="it__s">Painel de cabeceira · canto curvo</span></td><td class="it__v" role="cell">9.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">10.2</td><td class="it__d" role="cell"><span class="it__t">Suíte 3</span><span class="it__s">Painel de cabeceira</span></td><td class="it__v" role="cell">15.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">10.3</td><td class="it__d" role="cell"><span class="it__t">Suíte master</span><span class="it__s">Painel de cabeceira</span></td><td class="it__v" role="cell">9.000,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">10.4</td><td class="it__d" role="cell"><span class="it__t">Suíte 1</span><span class="it__s">Painel de cabeceira</span></td><td class="it__v" role="cell">9.000,00</td></tr>
+        <tr class="sub" role="row"><td role="cell"></td><td role="cell">Parcial · MDF Ultra Cru</td><td role="cell">42.000,00</td></tr>
+
+        <tr class="cat" role="row"><td colspan="3" role="cell">
+          <span class="cat__k">Marcenaria</span><span class="cat__n">Lâmina Carvalho Naturalle</span>
+        </td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">11.1</td><td class="it__d" role="cell"><span class="it__t">Copa</span><span class="it__s">Gabinete em L + torre quente + armário refrigerador + suspenso</span></td><td class="it__v" role="cell">190.000,00</td></tr>
+        <tr class="sub" role="row"><td role="cell"></td><td role="cell">Parcial · Carvalho Naturalle</td><td role="cell">190.000,00</td></tr>
+
+        <tr class="cat" role="row"><td colspan="3" role="cell">
+          <span class="cat__k">Marcenaria</span><span class="cat__n">Lâmina MDF Branco Diamante</span>
+        </td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">12.1</td><td class="it__d" role="cell"><span class="it__t">Dorm. serviço</span><span class="it__s">Roupeiro</span></td><td class="it__v" role="cell">15.300,00</td></tr>
+        <tr class="it" role="row"><td class="it__n" role="cell">12.2</td><td class="it__d" role="cell"><span class="it__t">Dorm. serviço</span><span class="it__s">Cômoda</span></td><td class="it__v" role="cell">15.300,00</td></tr>
+        <tr class="sub" role="row"><td role="cell"></td><td role="cell">Parcial · MDF Branco Diamante</td><td role="cell">30.600,00</td></tr>
+      </tbody>
+    </table>
+
+    <div class="grand">
+      <span class="grand__k">Subtotal · Marcenaria fina</span>
+      <span class="grand__v"><small>R$</small>3.203.979,00</span>
+    </div>
+
+    <div class="grand" style="border-top-width:2px;margin-top:var(--space-16);padding-top:var(--space-8)">
+      <span class="grand__k" style="letter-spacing:var(--track-label)">Investimento total</span>
+      <span class="grand__v" style="font-size:clamp(2.2rem, 1.2rem + 3.6vw, 4rem)"><small>R$</small>3.566.287,65</span>
+    </div>
+
+    <a class="next" href="#ch-07" style="margin-top:var(--space-12)">Condições <span class="next__arrow" aria-hidden="true">→</span></a>
+  </div>
+
+  <div class="runner" aria-hidden="true">
+    <span>Investimento total</span>
+    <b>R$ 3.566.287,65</b>
+  </div>
+</section>
+
+<!-- ═══════════════ 07 · CONDIÇÕES ═══════════════ -->
+<section class="chapter" id="ch-07" data-tone="paper" aria-label="07 Condições">
+  <div class="wrap wrap--tall">
+    <p class="eyebrow reveal"><span class="eyebrow__n">07</span> Condições</p>
+    <h2 class="display display--sm reveal" style="margin-top:var(--space-6)">Condições comerciais</h2>
+
+    <dl class="terms reveal">
+      <div class="terms__row"><dt class="terms__k">Pagamento</dt><dd class="terms__v">A combinar</dd></div>
+      <div class="terms__row"><dt class="terms__k">Validade da proposta</dt><dd class="terms__v">30 dias<span class="terms__note"> · a partir de 06 de agosto de 2026</span></dd></div>
+      <div class="terms__row"><dt class="terms__k">Prazo de entrega</dt><dd class="terms__v">120 dias<span class="terms__note"> · após a contratação</span></dd></div>
+      <div class="terms__row"><dt class="terms__k">Prazo de execução</dt><dd class="terms__v">120 dias<span class="terms__note"> · após a entrega do material</span></dd></div>
+      <div class="terms__row"><dt class="terms__k">Instalação</dt><dd class="terms__v">Inclusa<span class="terms__note"> · com gestão de obras, em todos os sistemas</span></dd></div>
+      <div class="terms__row"><dt class="terms__k">Garantia</dt><dd class="terms__v">10 anos</dd></div>
+    </dl>
+
+    <div class="bank reveal">
+      <p class="eyebrow" style="margin-bottom:var(--space-4)">Dados para pagamento</p>
+      <p class="bank__l">
+        <b>Banco Itaú</b> · Agência 3720 · C/C 30.288-8<br>
+        <b>PIX</b> pamella@parket.com.br
+      </p>
+      <p class="bank__e">
+        Mundial Export Assess. Com. e Ext. Imp e Exp Eireli · CNPJ 29.872.616/0001-34
+      </p>
+    </div>
+
+    <p class="body reveal" style="margin-top:var(--space-8);font-size:var(--text-sm)">
+      Metragens indicadas são reais; a perda técnica de 10% já está considerada nos valores.
+      Itens marcados como “confirmar” dependem de medição final em obra.
+    </p>
+
+    <a class="next reveal" href="#ch-08" style="margin-top:var(--space-12)">Confirmação <span class="next__arrow" aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<!-- ═══════════════ 08 · CONFIRMAÇÃO ═══════════════ -->
+<section class="chapter chapter--dark" id="ch-08" data-tone="dark" aria-label="08 Confirmação">
+  <div class="wrap wrap--tall" id="closeWrap">
+
+    <div id="closeIntro" class="close__hero">
+      <p class="eyebrow reveal"><span class="eyebrow__n">08</span> Confirmação</p>
+      <h2 class="display reveal">Vamos começar.</h2>
+      <p class="lede reveal">
+        Ao confirmar, preparamos o contrato e enviamos os documentos para assinatura digital.
+        Nenhum valor é cobrado nesta etapa.
+      </p>
+      <div class="reveal" style="display:flex;flex-wrap:wrap;gap:var(--space-4);margin-top:var(--space-6)">
+        <button type="button" class="btn" id="openForm">Aceitar proposta <span aria-hidden="true">→</span></button>
+        <a class="btn btn--ghost" href="#ch-06">Rever investimento</a>
+      </div>
+      <p style="margin-top:var(--space-8);font-size:var(--text-2xs);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--color-text-inverse-muted)">
+        Proposta 99918 · R$ 3.566.287,65 · validade 30 dias
+      </p>
+    </div>
+
+    <div id="closeForm" hidden>
+      <p class="eyebrow"><span class="eyebrow__n">08</span> Confirmação</p>
+      <h2 class="display display--sm" style="margin-top:var(--space-6)">Dados para o contrato</h2>
+      <p class="lede" style="margin-top:var(--space-4);max-width:52ch">
+        Preencha os campos abaixo. Em poucos minutos enviaremos os documentos para assinatura digital.
+      </p>
+
+      <form class="form" id="contractForm" novalidate>
+        <div class="field full">
+          <label for="cf_nome">Nome completo *</label>
+          <input id="cf_nome" name="nome" required autocomplete="name" value="MATHEUS DE ABREU COSTANTINI">
+        </div>
+        <div class="field">
+          <label for="cf_cpf">CPF / CNPJ *</label>
+          <input id="cf_cpf" name="cpf" required inputmode="numeric" placeholder="000.000.000-00">
+        </div>
+        <div class="field">
+          <label for="cf_rg">RG / IE *</label>
+          <input id="cf_rg" name="rg" required placeholder="00.000.000-0">
+        </div>
+        <div class="field">
+          <label for="cf_tel">Telefone *</label>
+          <input id="cf_tel" name="tel" type="tel" required autocomplete="tel" placeholder="(11) 9 9999-9999">
+        </div>
+        <div class="field">
+          <label for="cf_email">E-mail *</label>
+          <input id="cf_email" name="email" type="email" required autocomplete="email" placeholder="seu@email.com">
+        </div>
+        <div class="field">
+          <label for="cf_cep">CEP</label>
+          <input id="cf_cep" name="cep" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000">
+        </div>
+        <div class="field">
+          <label for="cf_estciv">Estado civil</label>
+          <select id="cf_estciv" name="estciv">
+            <option value="">Selecione…</option>
+            <option value="solteiro">Solteiro(a)</option>
+            <option value="casado">Casado(a)</option>
+            <option value="divorciado">Divorciado(a)</option>
+            <option value="viuvo">Viúvo(a)</option>
+            <option value="uniao_estavel">União estável</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="cf_rua">Endereço *</label>
+          <input id="cf_rua" name="rua" required autocomplete="address-line1" placeholder="Rua, avenida…">
+        </div>
+        <div class="field">
+          <label for="cf_num">Número *</label>
+          <input id="cf_num" name="num" required placeholder="471">
+        </div>
+        <div class="field">
+          <label for="cf_comp">Complemento</label>
+          <input id="cf_comp" name="comp" placeholder="Apto, sala…">
+        </div>
+        <div class="field full">
+          <label for="cf_bairro">Bairro *</label>
+          <input id="cf_bairro" name="bairro" required placeholder="Bairro">
+        </div>
+        <div class="field">
+          <label for="cf_cidade">Cidade *</label>
+          <input id="cf_cidade" name="cidade" required autocomplete="address-level2" value="São Paulo">
+        </div>
+        <div class="field">
+          <label for="cf_uf">Estado (UF) *</label>
+          <input id="cf_uf" name="uf" required maxlength="2" autocomplete="address-level1" value="SP" style="text-transform:uppercase">
+        </div>
+
+        <label class="consent" for="cf_termos">
+          <input type="checkbox" id="cf_termos" required>
+          <span>Li e estou de acordo com os termos do contrato e as condições comerciais apresentadas nesta proposta.</span>
+        </label>
+
+        <p class="status" id="cf_status" role="status" aria-live="polite"></p>
+        <button class="btn full" id="cf_submit" type="submit">Enviar dados <span aria-hidden="true">→</span></button>
+      </form>
+    </div>
+
+    <div id="closeDone" class="done" hidden>
+      <div class="done__mark" aria-hidden="true">✓</div>
+      <h2 class="display display--sm">Dados recebidos.</h2>
+      <p class="lede">
+        Obrigado. Nossa equipe entra em contato para finalizar a assinatura do contrato
+        e agendar as próximas etapas.
+      </p>
+      <p style="font-size:var(--text-2xs);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--color-text-inverse-muted)">
+        Proposta 99918 · Parket
+      </p>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Vinheta de abertura ────────────────────────────────────────────
+     Logo → hairline → dissolve. Sai sozinha em ~2s e qualquer interação
+     encerra na hora: uma abertura nunca pode segurar o cliente.        */
+  var veil = document.getElementById('intro');
+  if (veil) {
+    var veilDone = false;
+    var endVeil = function () {
+      if (veilDone) return;
+      veilDone = true;
+      veil.classList.add('is-out');
+      setTimeout(function () { veil.remove(); }, 700);
+    };
+    requestAnimationFrame(function () { veil.classList.add('is-in'); });
+    var veilTimer = setTimeout(endVeil, 1300);
+    ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (ev) {
+      window.addEventListener(ev, function () {
+        clearTimeout(veilTimer);
+        endVeil();
+      }, { passive: true, once: true });
+    });
+  }
+
+  /* ── Vídeo da capa ──────────────────────────────────────────────────
+     Uma única requisição: a fonte é escolhida depois do primeiro layout
+     (dentro de um iframe, matchMedia antes do layout pode ler a largura
+     errada e baixar o arquivo do tier errado). Enquanto isso o poster
+     já ocupa a tela — sem CLS e sem flash preto.                       */
+  var video = document.getElementById('coverVideo');
+  if (video) {
+    var SRC = {
+      desktop: 'https://parket.com.br/wp-content/uploads/2026/04/Parket-HeroNew.mp4',
+      mobile:  '/assets/Heromobile-v3.mp4'
+    };
+    var tier = null;
+    var ready = function () { video.classList.add('is-ready'); };
+
+    var pick = function () {
+      var want = window.matchMedia('(min-width: 769px)').matches ? 'desktop' : 'mobile';
+      if (want === tier) return;
+      tier = want;
+      video.src = SRC[want];
+      var p = video.play();
+      if (p && p.catch) p.catch(function () { ready(); });  // autoplay bloqueado → fica o poster
+    };
+
+    if (video.readyState >= 2) ready();
+    else video.addEventListener('loadeddata', ready, { once: true });
+
+    requestAnimationFrame(pick);
+    // Se o tier mudar antes do vídeo carregar (iframe redimensionando, rotação
+    // de tela), corrige. Depois de carregado nunca troca — evita re-download.
+    window.addEventListener('resize', function () {
+      if (video.readyState < 2) pick();
+    }, { passive: true });
+  }
+
+  /* ── Estado da navegação: capítulo atual, vistos, progresso, tom ── */
+  var deck     = document.getElementById('deck');
+  var chapters = [].slice.call(deck.querySelectorAll('.chapter'));
+  var items    = [].slice.call(document.querySelectorAll('.rail__item'));
+  var pos      = document.getElementById('railPos');
+  var bar      = document.getElementById('railBar');
+  var total    = chapters.length;
+  var current  = -1;
+
+  function setCurrent(i) {
+    if (i === current) return;
+    current = i;
+    chapters.forEach(function (c, n) { c.classList.toggle('is-active', n === i); });
+    items.forEach(function (a, n) {
+      a.classList.toggle('is-current', n === i);
+      if (n < i) a.classList.add('is-seen');
+      if (n === i) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
+    });
+    document.body.dataset.tone = chapters[i].dataset.tone || 'dark';
+    pos.textContent = String(i + 1).padStart(2, '0');
+    bar.style.width = ((i + 1) / total * 100) + '%';
+    // Mantém o item ativo visível na barra inferior do mobile
+    if (items[i] && items[i].scrollIntoView && window.innerWidth < 1024) {
+      items[i].scrollIntoView({ block: 'nearest', inline: 'center' });
+    }
+  }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) setCurrent(chapters.indexOf(e.target));
+      });
+    }, { root: deck, threshold: 0.55 });
+    chapters.forEach(function (c) { io.observe(c); });
+  }
+  setCurrent(0);
+  if (!('IntersectionObserver' in window)) {
+    // Sem observer nada mais recebe .is-active e todo conteúdo com .reveal
+    // ficaria em opacity:0. Revela tudo — perde-se só o destaque do trilho.
+    // (depois de setCurrent, que zera .is-active dos demais capítulos)
+    chapters.forEach(function (c) { c.classList.add('is-active'); });
+  }
+
+  /* ── Teclado: ← → navegam entre capítulos ── */
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
+    var next = e.key === 'ArrowRight' ? current + 1
+             : e.key === 'ArrowLeft'  ? current - 1 : null;
+    if (next === null || next < 0 || next >= total) return;
+    e.preventDefault();
+    chapters[next].scrollIntoView({ block: 'nearest', inline: 'start' });
+  });
+
+  /* ── Confirmação ── */
+  var openBtn = document.getElementById('openForm');
+  var closeIntro = document.getElementById('closeIntro');
+  var formBox = document.getElementById('closeForm');
+  var doneBox = document.getElementById('closeDone');
+
+  if (openBtn) {
+    openBtn.addEventListener('click', function () {
+      closeIntro.hidden = true;
+      formBox.hidden = false;
+      document.getElementById('cf_nome').focus();
+    });
+  }
+
+  /* CEP → ViaCEP */
+  var cep = document.getElementById('cf_cep');
+  if (cep) {
+    cep.addEventListener('input', function () {
+      var v = cep.value.replace(/\D/g, '').slice(0, 8);
+      cep.value = v.length > 5 ? v.slice(0, 5) + '-' + v.slice(5) : v;
+    });
+    cep.addEventListener('blur', function () {
+      var v = cep.value.replace(/\D/g, '');
+      if (v.length !== 8) return;
+      fetch('https://viacep.com.br/ws/' + v + '/json/')
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.erro) return;
+          var set = function (id, val) { if (val) document.getElementById(id).value = val; };
+          set('cf_rua', d.logradouro); set('cf_bairro', d.bairro);
+          set('cf_cidade', d.localidade); set('cf_uf', d.uf);
+        })
+        .catch(function () {});
+    });
+  }
+
+  var SUPA = {
+    url:  'https://api.parket.works',
+    anon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhieHBpbHJ4bWl0dnplYmx1b29tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDI1MjcsImV4cCI6MjA4ODUxODUyN30.ciZA1H-UvlYG2OPWqrFChj-_ttiFD5W5BmrST-gUJ-0'
+  };
+  var SIM_ID = 'aaaa1111-2222-4333-8444-202608060001';
+
+  var form = document.getElementById('contractForm');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var btn    = document.getElementById('cf_submit');
+      var status = document.getElementById('cf_status');
+      var val    = function (id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; };
+
+      var dados = {
+        nome: val('cf_nome'), cpf_cnpj: val('cf_cpf'), rg: val('cf_rg'),
+        telefone: val('cf_tel'), email: val('cf_email'), cep: val('cf_cep'),
+        rua: val('cf_rua'), numero: val('cf_num'), complemento: val('cf_comp'),
+        bairro: val('cf_bairro'), cidade: val('cf_cidade'), uf: val('cf_uf').toUpperCase(),
+        estado_civil: val('cf_estciv'), aceito_em: new Date().toISOString()
+      };
+
+      var required = {
+        cf_nome: 'nome', cf_cpf: 'CPF/CNPJ', cf_rg: 'RG/IE', cf_tel: 'telefone',
+        cf_email: 'e-mail', cf_rua: 'endereço', cf_num: 'número',
+        cf_bairro: 'bairro', cf_cidade: 'cidade', cf_uf: 'UF'
+      };
+      var missing = Object.keys(required).filter(function (id) { return !val(id); })
+                          .map(function (id) { return required[id]; });
+      if (!document.getElementById('cf_termos').checked) missing.push('aceitar os termos');
+
+      if (missing.length) {
+        status.className = 'status is-err';
+        status.textContent = 'Falta preencher: ' + missing.join(', ') + '.';
+        var first = Object.keys(required).filter(function (id) { return !val(id); })[0];
+        if (first) document.getElementById(first).focus();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando…';
+      status.className = 'status';
+      status.textContent = '';
+
+      var headers = { apikey: SUPA.anon, Authorization: 'Bearer ' + SUPA.anon };
+
+      fetch(SUPA.url + '/rest/v1/simulacao_projetos?id=eq.' + SIM_ID + '&select=meta', { headers: headers })
+        .then(function (r) { return r.json(); })
+        .then(function (rows) {
+          var meta = (rows && rows[0] && rows[0].meta) || {};
+          meta.contrato_cliente = dados;
+          return fetch(SUPA.url + '/rest/v1/simulacao_projetos?id=eq.' + SIM_ID, {
+            method: 'PATCH',
+            headers: {
+              apikey: SUPA.anon, Authorization: 'Bearer ' + SUPA.anon,
+              'Content-Type': 'application/json', Prefer: 'return=minimal'
+            },
+            body: JSON.stringify({ meta: meta })
+          });
+        })
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          formBox.hidden = true;
+          doneBox.hidden = false;
+          doneBox.setAttribute('tabindex', '-1');
+          doneBox.focus();
+        })
+        .catch(function (err) {
+          btn.disabled = false;
+          btn.innerHTML = 'Enviar dados <span aria-hidden="true">→</span>';
+          status.className = 'status is-err';
+          status.textContent = 'Não foi possível enviar: ' + (err.message || err) + '. Tente novamente.';
+        });
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
