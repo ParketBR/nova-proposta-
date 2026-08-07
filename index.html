@@ -204,7 +204,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 .rail__pos b{ color:var(--rail-fg); font-weight:500; }
 .rail__bar{ height:1px; background:var(--rail-line); overflow:hidden; }
 .rail__bar i{
-  display:block; height:100%; width:12.5%;
+  display:block; height:100%; width:20%;   /* 1 de 5 capítulos — estado pré-JS */
   background:var(--rail-accent);
   transition:width var(--duration-slow) var(--ease-out);
 }
@@ -583,7 +583,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 .rooms b{ font-weight:400; color:var(--color-text-inverse); }
 .rooms i{ font-style:normal; font-variant-numeric:tabular-nums; color:var(--color-accent); }
 
-/* ═══ 06 · INVESTIMENTO ════════════════════════════════════════════ */
+/* ═══ 03 · INVESTIMENTO ════════════════════════════════════════════ */
 .ledger{ margin-top:var(--space-8); font-variant-numeric:tabular-nums; }
 .ledger caption{ text-align:left; }
 .ledger__head th{
@@ -652,7 +652,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     font-size:var(--text-2xs); font-weight:500; letter-spacing:var(--track-label); text-transform:uppercase;
     color:var(--color-text-faint);
   }
-  #ch-06 .wrap{ padding-bottom:calc(var(--pad-y) + 64px); }
+  #ch-03 .wrap{ padding-bottom:calc(var(--pad-y) + 64px); }
   .runner b{
     font-size:var(--text-md); font-weight:var(--weight-body);
     letter-spacing:0; text-transform:none; color:var(--color-text);
@@ -683,7 +683,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   .sub td:last-child::before{ content:'R$ '; font-size:var(--text-sm); color:var(--color-text-faint); }
 }
 
-/* ═══ 07 · CONDIÇÕES ═══════════════════════════════════════════════ */
+/* ═══ 04 · CONDIÇÕES ═══════════════════════════════════════════════ */
 .terms{ display:grid; gap:0; margin-top:var(--space-8); }
 @media (min-width:768px){ .terms{ grid-template-columns:repeat(2,1fr); column-gap:var(--space-16); } }
 .terms__row{
@@ -705,7 +705,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 .bank__l b{ font-weight:500; }
 .bank__e{ margin-top:var(--space-3); font-size:var(--text-sm); color:var(--color-text-faint); }
 
-/* ═══ 08 · CONFIRMAÇÃO ═════════════════════════════════════════════ */
+/* ═══ 05 · CONFIRMAÇÃO ═════════════════════════════════════════════ */
 .close__hero{ display:flex; flex-direction:column; gap:var(--space-6); max-width:36ch; }
 .form{ display:grid; grid-template-columns:repeat(2,1fr); gap:var(--space-4); margin-top:var(--space-8); }
 .form .full{ grid-column:1/-1; }
@@ -771,7 +771,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   <span class="intro__line"></span>
 </div>
 
-<a class="skip" href="#ch-06">Ir direto para o investimento</a>
+<a class="skip" href="#ch-03">Ir direto para o investimento</a>
 
 <!-- ═══════════════ NAVEGAÇÃO ═══════════════ -->
 <nav class="rail" aria-label="Capítulos da proposta">
@@ -780,18 +780,15 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   </div>
 
   <ol class="rail__list" id="railList">
-    <li><a class="rail__item" href="#ch-01"><span class="rail__num">01</span><span class="rail__label">Capa</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-01"><span class="rail__num">01</span><span class="rail__label">Inicio</span><span class="rail__tick"></span></a></li>
     <li><a class="rail__item" href="#ch-02"><span class="rail__num">02</span><span class="rail__label">Projeto</span><span class="rail__tick"></span></a></li>
-    <li><a class="rail__item" href="#ch-03"><span class="rail__num">03</span><span class="rail__label">Conceito</span><span class="rail__tick"></span></a></li>
-    <li><a class="rail__item" href="#ch-04"><span class="rail__num">04</span><span class="rail__label">Produto</span><span class="rail__tick"></span></a></li>
-    <li><a class="rail__item" href="#ch-05"><span class="rail__num">05</span><span class="rail__label">Aplicação</span><span class="rail__tick"></span></a></li>
-    <li><a class="rail__item" href="#ch-06"><span class="rail__num">06</span><span class="rail__label">Investimento</span><span class="rail__tick"></span></a></li>
-    <li><a class="rail__item" href="#ch-07"><span class="rail__num">07</span><span class="rail__label">Condições</span><span class="rail__tick"></span></a></li>
-    <li><a class="rail__item" href="#ch-08"><span class="rail__num">08</span><span class="rail__label">Confirmação</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-03"><span class="rail__num">03</span><span class="rail__label">Investimento</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-04"><span class="rail__num">04</span><span class="rail__label">Condições</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-05"><span class="rail__num">05</span><span class="rail__label">Confirmação</span><span class="rail__tick"></span></a></li>
   </ol>
 
   <div class="rail__foot">
-    <span class="rail__pos"><b id="railPos">01</b> / 08</span>
+    <span class="rail__pos"><b id="railPos">01</b> / 05</span>
     <div class="rail__bar"><i id="railBar"></i></div>
   </div>
 </nav>
@@ -814,11 +811,11 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       <p class="eyebrow reveal" style="color:rgba(232,228,223,.6)">
         <span class="eyebrow__n">01</span> Proposta comercial · 99918
       </p>
-      <h1 class="cover__title reveal" style="margin-top:var(--space-6)">Rua Caconde<br>471</h1>
-      <p class="cover__sub reveal">Jardim Paulista · São Paulo</p>
+      <h1 class="cover__title reveal" style="margin-top:var(--space-6)">Matheus de Abreu<br>Costantini</h1>
+   
 
       <dl class="cover__meta reveal">
-        <div><dt>Contratante</dt><dd>Matheus de Abreu Costantini</dd></div>
+        <div><dt>Local</dt><dd>Jardim Paulista · São Paulo</dd></div>
         <div><dt>Data</dt><dd>06 de agosto de 2026</dd></div>
         <div><dt>Validade</dt><dd>30 dias</dd></div>
       </dl>
@@ -827,7 +824,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     <div class="cover__foot">
       <a class="next" href="#ch-02">Iniciar <span class="next__arrow" aria-hidden="true">→</span></a>
       <p style="font-size:var(--text-2xs);letter-spacing:var(--track-label);text-transform:uppercase;color:rgba(232,228,223,.45)">
-        Pisos, decks, forros e painéis em madeira nobre
+      Pisos, decks, zforros, painéis, portas e marcenaria em madeira nobre
       </p>
     </div>
   </div>
@@ -837,7 +834,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 <section class="chapter chapter--dark" id="ch-02" data-tone="dark" aria-label="02 Projeto">
   <div class="wrap wrap--tall">
     <p class="eyebrow reveal"><span class="eyebrow__n">02</span> Projeto</p>
-    <h2 class="display reveal" style="margin-top:var(--space-6)">Um apartamento inteiro em madeira nobre.</h2>
+    <h2 class="display reveal" style="margin-top:var(--space-6)">Uma experiência completa em madeira.</h2>
     <p class="lede reveal" style="margin-top:var(--space-6)">
       Especificação completa para a unidade 4A: do piso ao forro, do painel de parede
       às portas e à marcenaria fina. Uma única linguagem de material em todos os ambientes.
@@ -851,331 +848,18 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       <div class="spec__row"><dt class="spec__k">Cidade</dt><dd class="spec__v">São Paulo · SP</dd></div>
       <div class="spec__row"><dt class="spec__k">Data</dt><dd class="spec__v">06 de agosto de 2026</dd></div>
       <div class="spec__row"><dt class="spec__k">Validade</dt><dd class="spec__v">30 dias</dd></div>
-      <div class="spec__row"><dt class="spec__k">Consultor</dt><dd class="spec__v">A definir</dd></div>
       <div class="spec__row"><dt class="spec__k">Garantia</dt><dd class="spec__v">10 anos</dd></div>
     </dl>
 
-    <div class="figures reveal">
-      <div><p class="figures__n">300<small style="font-size:.42em"> m²</small></p><p class="figures__l">Revestimento em madeira</p></div>
-      <div><p class="figures__n">32</p><p class="figures__l">Portas</p></div>
-      <div><p class="figures__n">35</p><p class="figures__l">Peças de marcenaria</p></div>
-    </div>
 
-    <a class="next reveal" href="#ch-03" style="margin-top:var(--space-12)">Conceito <span class="next__arrow" aria-hidden="true">→</span></a>
+    <a class="next reveal" href="#ch-03" style="margin-top:var(--space-12)">Investimento <span class="next__arrow" aria-hidden="true">→</span></a>
   </div>
 </section>
 
-<!-- ═══════════════ 03 · CONCEITO ═══════════════ -->
-<section class="chapter" id="ch-03" data-tone="paper" aria-label="03 Conceito">
+<!-- ═══════════════ 03 · INVESTIMENTO ═══════════════ -->
+<section class="chapter" id="ch-03" data-tone="paper" aria-label="03 Investimento">
   <div class="wrap">
-    <p class="eyebrow reveal"><span class="eyebrow__n">03</span> Conceito</p>
-
-    <div class="concept" style="margin-top:var(--space-8)">
-      <div>
-        <h2 class="display reveal">Três madeiras, um só projeto.</h2>
-        <p class="lede reveal" style="margin-top:var(--space-6)">
-          A especificação parte de uma paleta contínua. O Carvalho Europeu Naturalle atravessa
-          o apartamento no piso, no rodapé, nos painéis e nas portas. O Tauari Naturalle ripado
-          resolve os forros das áreas sociais. O Carvalho Smoked escurece a marcenaria fina,
-          criando profundidade sem romper a leitura do conjunto.
-        </p>
-        <p class="body reveal" style="margin-top:var(--space-6)">
-          Laca, MDF e alumínio ficam onde a madeira não deve aparecer: áreas de serviço,
-          roupeiros internos e ambientes molhados. Cada aplicação inclui insumos,
-          instalação e gestão de obras.
-        </p>
-      </div>
-
-      <figure class="reveal">
-        <div class="frame frame--photo">
-          <img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-16.jpg"
-               srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-16-768x510.jpg 768w,
-                       https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-16-1024x679.jpg 1024w,
-                       https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-16-1536x1019.jpg 1536w,
-                       https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-16.jpg 2000w"
-               sizes="(min-width:1024px) 34vw, 92vw"
-               alt="Interior residencial com piso em carvalho" loading="lazy" decoding="async"
-               width="2000" height="1327">
-        </div>
-        <figcaption class="frame__cap">Projeto Parket · piso em carvalho</figcaption>
-      </figure>
-    </div>
-
-    <div class="woods reveal">
-      <!-- Trio de referência de aplicação (fotografia Parket). Para trocar por
-           fotos do projeto do cliente, substitua apenas o src de cada figure. -->
-      <figure>
-        <div class="wood__sw"><img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-25.jpg"
-          srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-25-768x510.jpg 768w,
-                  https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-25-1024x679.jpg 1024w,
-                  https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-25-1536x1019.jpg 1536w"
-          sizes="(min-width:1024px) 23vw, (min-width:640px) 30vw, 92vw"
-          alt="Suíte com piso em carvalho" loading="lazy" decoding="async" width="2000" height="1327"></div>
-        <figcaption><span class="wood__n">Piso e rodapé</span><br><span class="wood__s">Carvalho Europeu Naturalle</span></figcaption>
-      </figure>
-      <figure>
-        <div class="wood__sw"><img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-04.jpg"
-          srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-04-768x510.jpg 768w,
-                  https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-04-1024x679.jpg 1024w,
-                  https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-04-1536x1019.jpg 1536w"
-          sizes="(min-width:1024px) 23vw, (min-width:640px) 30vw, 92vw"
-          alt="Forro ripado em madeira" loading="lazy" decoding="async" width="2000" height="1327"></div>
-        <figcaption><span class="wood__n">Forro</span><br><span class="wood__s">Ripado Tauari Naturalle</span></figcaption>
-      </figure>
-      <figure>
-        <div class="wood__sw"><img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-06.jpg"
-          srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-06-768x510.jpg 768w,
-                  https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-06-1024x679.jpg 1024w,
-                  https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-06-1536x1019.jpg 1536w"
-          sizes="(min-width:1024px) 23vw, (min-width:640px) 30vw, 92vw"
-          alt="Marcenaria em lâmina de madeira" loading="lazy" decoding="async" width="2000" height="1327"></div>
-        <figcaption><span class="wood__n">Marcenaria</span><br><span class="wood__s">Lâmina Carvalho Smoked</span></figcaption>
-      </figure>
-    </div>
-
-    <a class="next reveal" href="#ch-04" style="margin-top:var(--space-16)">Produto <span class="next__arrow" aria-hidden="true">→</span></a>
-  </div>
-</section>
-
-<!-- ═══════════════ 04 · PRODUTO ═══════════════ -->
-<section class="chapter" id="ch-04" data-tone="paper" aria-label="04 Produto">
-  <div class="wrap">
-    <p class="eyebrow reveal"><span class="eyebrow__n">04</span> Produto</p>
-    <h2 class="display display--sm reveal" style="margin-top:var(--space-6)">Especificação técnica</h2>
-
-    <article class="product">
-      <figure class="product__media">
-        <div class="frame frame--photo">
-          <img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-01.jpg"
-               srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-01-768x510.jpg 768w,
-                       https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-01-1024x679.jpg 1024w,
-                       https://parket.com.br/wp-content/uploads/2025/10/PRO_PI_CA-01-1536x1019.jpg 1536w"
-               sizes="(min-width:1024px) 32vw, (min-width:900px) 40vw, 92vw"
-               alt="Piso em Carvalho Europeu Naturalle aplicado" loading="lazy" decoding="async"
-               width="2000" height="1327">
-        </div>
-      </figure>
-      <div>
-        <p class="product__i">01</p>
-        <h3 class="product__n">Carvalho Europeu Naturalle</h3>
-        <p class="body">Madeira de folhosa europeia de veio calmo e tom claro uniforme. Aplicada no piso,
-          no rodapé, nos painéis de parede e nas folhas de porta. É o material que dá continuidade ao projeto.</p>
-        <dl class="attrs">
-          <div class="attrs__row"><dt class="attrs__k">Dimensões · piso</dt><dd class="attrs__v">15/3 × 19 × 190 cm</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Padrão</dt><dd class="attrs__v">Régua longa</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Acabamento</dt><dd class="attrs__v">Naturalle</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Aplicações</dt><dd class="attrs__v">Piso · rodapé · painel · porta</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Perda técnica</dt><dd class="attrs__v">10% sobre a metragem real</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Garantia</dt><dd class="attrs__v">10 anos</dd></div>
-        </dl>
-      </div>
-    </article>
-
-    <article class="product product--flip">
-      <figure class="product__media">
-        <div class="frame frame--photo">
-          <img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-05.jpg"
-               srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-05-768x510.jpg 768w,
-                       https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-05-1024x679.jpg 1024w,
-                       https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-05-1536x1019.jpg 1536w"
-               sizes="(min-width:1024px) 32vw, (min-width:900px) 40vw, 92vw"
-               alt="Forro ripado em Tauari Naturalle" loading="lazy" decoding="async"
-               width="2000" height="1327">
-        </div>
-      </figure>
-      <div>
-        <p class="product__i">02</p>
-        <h3 class="product__n">Tauari Naturalle ripado</h3>
-        <p class="body">Ripado de Tauari com bunha de 0,5 cm e comprimento variável, aplicado nos forros
-          das áreas sociais. O ritmo das ripas dá escala ao pé-direito sem competir com o piso.</p>
-        <dl class="attrs">
-          <div class="attrs__row"><dt class="attrs__k">Dimensões</dt><dd class="attrs__v">1,8 × 3,5 cm · bunha 0,5 cm</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Comprimento</dt><dd class="attrs__v">Variável</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Acabamento</dt><dd class="attrs__v">Naturalle</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Aplicação</dt><dd class="attrs__v">Forro</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Área</dt><dd class="attrs__v">116 m² reais · 128 m² com perda</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Garantia</dt><dd class="attrs__v">10 anos</dd></div>
-        </dl>
-      </div>
-    </article>
-
-    <article class="product">
-      <figure class="product__media">
-        <div class="frame frame--photo">
-          <img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-12.jpg"
-               srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-12-768x510.jpg 768w,
-                       https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-12-1024x679.jpg 1024w,
-                       https://parket.com.br/wp-content/uploads/2025/10/PRO_PA-12-1536x1019.jpg 1536w"
-               sizes="(min-width:1024px) 32vw, (min-width:900px) 40vw, 92vw"
-               alt="Marcenaria fina em lâmina de carvalho" loading="lazy" decoding="async"
-               width="2000" height="1327">
-        </div>
-      </figure>
-      <div>
-        <p class="product__i">03</p>
-        <h3 class="product__n">Lâmina Carvalho Smoked</h3>
-        <p class="body">Lâmina de carvalho com tratamento fumê, mais escura e de veio marcado.
-          Reservada à marcenaria fina: estantes, buffets, gabinetes e mesas de cabeceira.</p>
-        <dl class="attrs">
-          <div class="attrs__row"><dt class="attrs__k">Tipo</dt><dd class="attrs__v">Lâmina natural</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Acabamento</dt><dd class="attrs__v">Smoked</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Aplicação</dt><dd class="attrs__v">Marcenaria fina</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Peças</dt><dd class="attrs__v">16 itens especificados</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Execução</dt><dd class="attrs__v">Sob medida</dd></div>
-          <div class="attrs__row"><dt class="attrs__k">Garantia</dt><dd class="attrs__v">10 anos</dd></div>
-        </dl>
-      </div>
-    </article>
-
-    <div style="margin-top:var(--space-16)">
-      <div class="section-head"><span>Acabamentos complementares</span><span>07</span></div>
-      <div class="finishes">
-        <div class="finishes__row"><span class="finishes__n">Lâmina Carvalho Naturalle</span><span class="finishes__u">Marcenaria · copa</span></div>
-        <div class="finishes__row"><span class="finishes__n">Laca</span><span class="finishes__u">Portas · painel</span></div>
-        <div class="finishes__row"><span class="finishes__n">Lâmina laca / MDF Branco Diamante</span><span class="finishes__u">Roupeiros · armários</span></div>
-        <div class="finishes__row"><span class="finishes__n">MDF Ultra Branco Diamante Duratex</span><span class="finishes__u">Despensa · lavanderia</span></div>
-        <div class="finishes__row"><span class="finishes__n">MDF Ultra Cru</span><span class="finishes__u">Painéis de cabeceira</span></div>
-        <div class="finishes__row"><span class="finishes__n">MDF Branco Diamante</span><span class="finishes__u">Dormitório de serviço</span></div>
-        <div class="finishes__row"><span class="finishes__n">Alumínio · vidro canelado</span><span class="finishes__u">Portas de passagem</span></div>
-      </div>
-    </div>
-
-    <a class="next reveal" href="#ch-05" style="margin-top:var(--space-16)">Aplicação <span class="next__arrow" aria-hidden="true">→</span></a>
-  </div>
-</section>
-
-<!-- ═══════════════ 05 · APLICAÇÃO ═══════════════ -->
-<section class="chapter chapter--dark" id="ch-05" data-tone="dark" aria-label="05 Aplicação">
-  <div class="wrap">
-    <p class="eyebrow reveal"><span class="eyebrow__n">05</span> Aplicação</p>
-
-    <h2 class="display display--sm reveal" style="margin-top:var(--space-6)">Onde cada sistema entra</h2>
-    <p class="lede reveal" style="margin-top:var(--space-4)">
-      Os dois grupos comerciais da proposta. Metragens reais; a perda técnica de 10%
-      está considerada no investimento.
-    </p>
-
-    <!-- ── Grupo A · Aplicações ─────────────────────────────────────── -->
-    <div class="section-head" style="margin-top:var(--space-16)">
-      <span>A · Aplicações</span><span>Piso · rodapé · forro</span>
-    </div>
-
-    <div class="apply" style="margin-top:var(--space-8)">
-      <div class="apply__media reveal">
-        <figure>
-          <div class="frame frame--photo">
-            <img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-13.jpg"
-                 srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-13-768x510.jpg 768w,
-                         https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-13-1024x679.jpg 1024w,
-                         https://parket.com.br/wp-content/uploads/2025/10/PRO_FO-13-1536x1019.jpg 1536w"
-                 sizes="(min-width:1024px) 30vw, 92vw"
-                 alt="Ambiente com piso e forro em madeira" loading="lazy" decoding="async"
-                 width="2000" height="1327">
-          </div>
-          <figcaption class="frame__cap" style="color:var(--color-text-inverse-muted)">Piso e forro em madeira</figcaption>
-        </figure>
-      </div>
-
-      <div>
-        <div class="system">
-          <div class="system__head"><h3 class="system__n">Piso</h3><span class="system__m">98 m²</span></div>
-          <p class="system__s">Carvalho Europeu Naturalle · 15/3 × 19 × 190 cm</p>
-          <ul class="rooms">
-            <li><b>Circulação íntima</b> <i>9 m²</i></li>
-            <li><b>Suíte master + closet</b> <i>27 m²</i></li>
-            <li><b>Suíte 1</b> <i>15 m²</i></li>
-            <li><b>Suíte 2</b> <i>18 m²</i></li>
-            <li><b>Suíte 3</b> <i>16 m²</i></li>
-            <li><b>Circulação</b> <i>13 m²</i></li>
-          </ul>
-        </div>
-
-        <div class="system">
-          <div class="system__head"><h3 class="system__n">Rodapé</h3><span class="system__m">17 ml</span></div>
-          <p class="system__s">Carvalho Europeu Naturalle</p>
-          <ul class="rooms">
-            <li><b>Circulação íntima + suítes master, closet, 1, 2 e 3</b></li>
-          </ul>
-        </div>
-
-        <div class="system">
-          <div class="system__head"><h3 class="system__n">Forro</h3><span class="system__m">116 m²</span></div>
-          <p class="system__s">Ripado Tauari Naturalle · 1,8 × 3,5 cm</p>
-          <ul class="rooms">
-            <li><b>Home</b> <i>30 m²</i></li>
-            <li><b>Living</b> <i>36 m²</i></li>
-            <li><b>Hall de entrada + hall social</b> <i>20 m²</i></li>
-            <li><b>Sala de jantar + lavabo</b> <i>30 m²</i></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Grupo B · Marcenaria fina ────────────────────────────────── -->
-    <div class="section-head" style="margin-top:var(--space-24)">
-      <span>B · Marcenaria fina</span><span>Painel · porta · marcenaria</span>
-    </div>
-
-    <div class="apply apply--flip" style="margin-top:var(--space-8)">
-      <div class="apply__media reveal">
-        <figure>
-          <div class="frame frame--photo">
-            <img src="https://parket.com.br/wp-content/uploads/2025/10/PRO_PO-04.jpg"
-                 srcset="https://parket.com.br/wp-content/uploads/2025/10/PRO_PO-04-768x510.jpg 768w,
-                         https://parket.com.br/wp-content/uploads/2025/10/PRO_PO-04-1024x679.jpg 1024w,
-                         https://parket.com.br/wp-content/uploads/2025/10/PRO_PO-04-1536x1019.jpg 1536w"
-                 sizes="(min-width:1024px) 30vw, 92vw"
-                 alt="Portas e marcenaria em madeira" loading="lazy" decoding="async"
-                 width="2000" height="1327">
-          </div>
-          <figcaption class="frame__cap" style="color:var(--color-text-inverse-muted)">Portas e marcenaria sob medida</figcaption>
-        </figure>
-      </div>
-
-      <div>
-        <div class="system">
-          <div class="system__head"><h3 class="system__n">Painel</h3><span class="system__m">86 m²</span></div>
-          <p class="system__s">Lâmina Carvalho Europeu Naturalle</p>
-          <ul class="rooms">
-            <li><b>Sala de jantar</b> <i>33 m²</i></li>
-            <li><b>Living + varanda</b> <i>16 m²</i></li>
-            <li><b>Hall de entrada</b> <i>25 m²</i></li>
-            <li><b>Suíte master</b> <i>12 m²</i></li>
-          </ul>
-        </div>
-
-        <div class="system">
-          <div class="system__head"><h3 class="system__n">Portas</h3><span class="system__m">32 un</span></div>
-          <p class="system__s">Camarão · correr · pivotante · passagem</p>
-          <ul class="rooms">
-            <li><b>Laca</b> <i>18 un</i></li>
-            <li><b>Lâmina Carvalho Europeu</b> <i>11 un</i></li>
-            <li><b>Alumínio + vidro</b> <i>3 un</i></li>
-          </ul>
-        </div>
-
-        <div class="system">
-          <div class="system__head"><h3 class="system__n">Marcenaria</h3><span class="system__m">35 peças</span></div>
-          <p class="system__s">Carvalho Smoked · Carvalho Naturalle · laca · MDF</p>
-          <ul class="rooms">
-            <li><b>Estantes e painéis</b> <i>10</i></li>
-            <li><b>Gabinetes de banho</b> <i>4</i></li>
-            <li><b>Roupeiros e armários</b> <i>9</i></li>
-            <li><b>Cozinha e copa</b> <i>4</i></li>
-            <li><b>Cabeceiras e apoios</b> <i>8</i></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <a class="next reveal" href="#ch-06" style="margin-top:var(--space-16)">Investimento <span class="next__arrow" aria-hidden="true">→</span></a>
-  </div>
-</section>
-
-<!-- ═══════════════ 06 · INVESTIMENTO ═══════════════ -->
-<section class="chapter" id="ch-06" data-tone="paper" aria-label="06 Investimento">
-  <div class="wrap">
-    <p class="eyebrow reveal"><span class="eyebrow__n">06</span> Investimento</p>
+    <p class="eyebrow reveal"><span class="eyebrow__n">03</span> Investimento</p>
     <h2 class="display display--sm reveal" style="margin-top:var(--space-6)">Composição do investimento</h2>
     <p class="lede reveal" style="margin-top:var(--space-4)">
       Proposta 99918 · Matheus de Abreu Costantini. Valores em reais, com insumos,
@@ -1362,7 +1046,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       <span class="grand__v" style="font-size:clamp(2.2rem, 1.2rem + 3.6vw, 4rem)"><small>R$</small>3.566.287,65</span>
     </div>
 
-    <a class="next" href="#ch-07" style="margin-top:var(--space-12)">Condições <span class="next__arrow" aria-hidden="true">→</span></a>
+    <a class="next" href="#ch-04" style="margin-top:var(--space-12)">Condições <span class="next__arrow" aria-hidden="true">→</span></a>
   </div>
 
   <div class="runner" aria-hidden="true">
@@ -1371,10 +1055,10 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   </div>
 </section>
 
-<!-- ═══════════════ 07 · CONDIÇÕES ═══════════════ -->
-<section class="chapter" id="ch-07" data-tone="paper" aria-label="07 Condições">
+<!-- ═══════════════ 04 · CONDIÇÕES ═══════════════ -->
+<section class="chapter" id="ch-04" data-tone="paper" aria-label="04 Condições">
   <div class="wrap wrap--tall">
-    <p class="eyebrow reveal"><span class="eyebrow__n">07</span> Condições</p>
+    <p class="eyebrow reveal"><span class="eyebrow__n">04</span> Condições</p>
     <h2 class="display display--sm reveal" style="margin-top:var(--space-6)">Condições comerciais</h2>
 
     <dl class="terms reveal">
@@ -1402,16 +1086,16 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       Itens marcados como “confirmar” dependem de medição final em obra.
     </p>
 
-    <a class="next reveal" href="#ch-08" style="margin-top:var(--space-12)">Confirmação <span class="next__arrow" aria-hidden="true">→</span></a>
+    <a class="next reveal" href="#ch-05" style="margin-top:var(--space-12)">Confirmação <span class="next__arrow" aria-hidden="true">→</span></a>
   </div>
 </section>
 
-<!-- ═══════════════ 08 · CONFIRMAÇÃO ═══════════════ -->
-<section class="chapter chapter--dark" id="ch-08" data-tone="dark" aria-label="08 Confirmação">
+<!-- ═══════════════ 05 · CONFIRMAÇÃO ═══════════════ -->
+<section class="chapter chapter--dark" id="ch-05" data-tone="dark" aria-label="05 Confirmação">
   <div class="wrap wrap--tall" id="closeWrap">
 
     <div id="closeIntro" class="close__hero">
-      <p class="eyebrow reveal"><span class="eyebrow__n">08</span> Confirmação</p>
+      <p class="eyebrow reveal"><span class="eyebrow__n">05</span> Confirmação</p>
       <h2 class="display reveal">Vamos começar.</h2>
       <p class="lede reveal">
         Ao confirmar, preparamos o contrato e enviamos os documentos para assinatura digital.
@@ -1419,7 +1103,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       </p>
       <div class="reveal" style="display:flex;flex-wrap:wrap;gap:var(--space-4);margin-top:var(--space-6)">
         <button type="button" class="btn" id="openForm">Aceitar proposta <span aria-hidden="true">→</span></button>
-        <a class="btn btn--ghost" href="#ch-06">Rever investimento</a>
+        <a class="btn btn--ghost" href="#ch-03">Rever investimento</a>
       </div>
       <p style="margin-top:var(--space-8);font-size:var(--text-2xs);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--color-text-inverse-muted)">
         Proposta 99918 · R$ 3.566.287,65 · validade 30 dias
@@ -1427,7 +1111,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     </div>
 
     <div id="closeForm" hidden>
-      <p class="eyebrow"><span class="eyebrow__n">08</span> Confirmação</p>
+      <p class="eyebrow"><span class="eyebrow__n">05</span> Confirmação</p>
       <h2 class="display display--sm" style="margin-top:var(--space-6)">Dados para o contrato</h2>
       <p class="lede" style="margin-top:var(--space-4);max-width:52ch">
         Preencha os campos abaixo. Em poucos minutos enviaremos os documentos para assinatura digital.
