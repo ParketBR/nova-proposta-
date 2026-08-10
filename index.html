@@ -447,6 +447,9 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   .cover__logo{ display:none; }
 }
 .cover__logo{ height:clamp(14px, 1.8vw, 20px); width:auto; align-self:flex-start; flex:none; }
+/* Wordmark no lugar do título do capítulo 02. Teto de 48px: a arte tem 101px
+   de altura e acima disso começa a amolecer em telas retina. */
+.project__logo{ height:clamp(30px, 1.4rem + 2vw, 48px); width:auto; }
 .cover__main{ margin-top:auto; }
 .cover__title{
   font-weight:var(--weight-display);
@@ -830,7 +833,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 <!-- Vinheta de abertura: o vídeo já roda por baixo, então o corte revela
      movimento em vez de começar do frame zero. -->
 <div class="intro" id="intro" aria-hidden="true">
-  <img class="intro__logo" src="logo/logo-parket.png" alt="Parket" width="668" height="374">
+  <img class="intro__logo" src="logo/logo-parket.png" alt="Parket" width="170" height="34">
   <span class="intro__line"></span>
 </div>
 
@@ -839,7 +842,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 <!-- ═══════════════ NAVEGAÇÃO ═══════════════ -->
 <nav class="rail" aria-label="Capítulos da proposta">
   <div class="rail__brand">
-    <img class="rail__logo" src="logo/logo-parket.png" alt="Parket" width="668" height="374">
+    <img class="rail__logo" src="logo/logo-parket.png" alt="Parket" width="170" height="34">
   </div>
 
   <ol class="rail__list" id="railList">
@@ -869,7 +872,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   </div>
 
   <div class="cover__inner">
-    <img class="cover__logo reveal" src="logo/logo-parket.png" alt="Parket" width="668" height="374">
+    <img class="cover__logo reveal" src="logo/logo-parket.png" alt="Parket" width="170" height="34">
 
     <div class="cover__main">
       <p class="eyebrow reveal" style="color:rgba(232,228,223,.6)">
@@ -898,7 +901,9 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 <section class="chapter chapter--dark" id="ch-02" data-tone="dark" aria-label="02 Projeto">
   <div class="wrap wrap--tall">
     <p class="eyebrow reveal"><span class="eyebrow__n">02</span> Projeto</p>
-    <h2 class="display reveal" style="margin-top:var(--space-6)">Uma experiência completa em madeira.</h2>
+    <h2 class="reveal" style="margin-top:var(--space-6)">
+      <img class="project__logo" src="logo/logo-parket-lg.png" alt="Parket" width="461" height="101">
+    </h2>
     <p class="lede reveal" style="margin-top:var(--space-6)">
       Especificação completa para a unidade 4A: do piso ao forro, do painel de parede
       às portas e à marcenaria fina. Uma única linguagem de material em todos os ambientes.
