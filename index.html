@@ -632,16 +632,21 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
          font-size:var(--text-2xs); font-weight:var(--weight-label); letter-spacing:var(--track-label); text-transform:uppercase; }
 .sub td:last-child{ text-align:right; white-space:nowrap; letter-spacing:0; font-size:var(--text-md); }
 
+/* Subtotal de grupo — fecha o capítulo sem competir com o total geral,
+   que é o único valor cheio do documento (capítulo 05). */
 .grand{
   display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between;
   gap:var(--space-4); margin-top:var(--space-6);
-  padding:var(--space-4) var(--space-2); border-top:2px solid var(--color-text);
+  padding:var(--space-4) var(--space-2); border-top:1px solid var(--color-text);
 }
 .grand__k{ font-size:var(--text-2xs); font-weight:var(--weight-label); letter-spacing:var(--track-label); text-transform:uppercase; }
 .grand__v{
-  font-weight:var(--weight-display); font-size:clamp(1.6rem, 1rem + 2.4vw, 2.8rem);
+  font-weight:var(--weight-display); font-size:clamp(1.25rem, .95rem + 1.1vw, 1.75rem);
   line-height:1; font-variant-numeric:tabular-nums; white-space:nowrap;
 }
+/* Total geral — mantém o peso, já que agora aparece uma vez só */
+.grand--total{ border-top-width:2px; padding-top:var(--space-6); }
+.grand--total .grand__v{ font-size:clamp(1.6rem, 1.1rem + 1.8vw, 2.6rem); }
 .grand__v small{ font-family:var(--font-sans); font-size:.36em; font-weight:500;
                  color:var(--color-text-faint); margin-right:.5em; letter-spacing:.06em; }
 
@@ -811,7 +816,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   <ol class="rail__list" id="railList">
     <li><a class="rail__item" href="#ch-01"><span class="rail__num">01</span><span class="rail__label">Inicio</span><span class="rail__tick"></span></a></li>
     <li><a class="rail__item" href="#ch-02"><span class="rail__num">02</span><span class="rail__label">Projeto</span><span class="rail__tick"></span></a></li>
-    <li><a class="rail__item" href="#ch-03"><span class="rail__num">03</span><span class="rail__label">Aplicações</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-03"><span class="rail__num">03</span><span class="rail__label">Revestimento</span><span class="rail__tick"></span></a></li>
     <li><a class="rail__item" href="#ch-04"><span class="rail__num">04</span><span class="rail__label">Marcenaria fina</span><span class="rail__tick"></span></a></li>
     <li><a class="rail__item" href="#ch-05"><span class="rail__num">05</span><span class="rail__label">Condições</span><span class="rail__tick"></span></a></li>
     <li><a class="rail__item" href="#ch-06"><span class="rail__num">06</span><span class="rail__label">Confirmação</span><span class="rail__tick"></span></a></li>
@@ -854,7 +859,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     <div class="cover__foot">
       <a class="next" href="#ch-02">Iniciar <span class="next__arrow" aria-hidden="true">→</span></a>
       <p style="font-size:var(--text-2xs);letter-spacing:var(--track-label);text-transform:uppercase;color:rgba(232,228,223,.45)">
-      Pisos, decks, forros, painéis, portas e marcenaria em madeira nobre
+    Pisos, decks, forros, painéis, portas e marcenaria em madeira nobre.
       </p>
     </div>
   </div>
@@ -883,26 +888,26 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     </dl>
 
 
-    <a class="next reveal" href="#ch-03" style="margin-top:var(--space-12)">Aplicações <span class="next__arrow" aria-hidden="true">→</span></a>
+    <a class="next reveal" href="#ch-03" style="margin-top:var(--space-12)">Revestimento <span class="next__arrow" aria-hidden="true">→</span></a>
   </div>
 </section>
 
 <!-- ═══════════════ 03 · INVESTIMENTO ═══════════════ -->
-<section class="chapter" id="ch-03" data-tone="paper" aria-label="03 Aplicações">
+<section class="chapter" id="ch-03" data-tone="paper" aria-label="03 Revestimento">
   <div class="wrap">
-    <p class="eyebrow reveal"><span class="eyebrow__n">03</span> Aplicações</p>
+    <p class="eyebrow reveal"><span class="eyebrow__n">03</span> Revestimento</p>
     <h2 class="display display--sm reveal" style="margin-top:var(--space-6)">Piso, rodapé e forro</h2>
     <p class="lede reveal" style="margin-top:var(--space-4)">
       Proposta 99918 · Matheus de Abreu Costantini. Valores em reais, com insumos,
       instalação e gestão de obras inclusos em cada sistema.
     </p>
 
-    <!-- ── Grupo A · Aplicações ── -->
+    <!-- ── Grupo A · Revestimento ── -->
     <div class="section-head" style="margin-top:var(--space-8)">
-      <span>A · Aplicações</span><span>Piso · rodapé · forro</span>
+      <span>A · Revestimento</span><span>Piso · rodapé · forro</span>
     </div>
     <table class="ledger" role="table">
-      <caption class="sr-only">Grupo A · Aplicações · piso, rodapé e forro</caption>
+      <caption class="sr-only">Grupo A · Revestimento · piso, rodapé e forro</caption>
       <thead class="ledger__head"><tr><th scope="col">Item</th><th scope="col">Descritivo</th><th scope="col">Valor (R$)</th></tr></thead>
       <tbody>
         <tr class="cat" role="row"><td colspan="3" role="cell">
@@ -945,7 +950,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     </table>
 
     <div class="grand">
-      <span class="grand__k">Subtotal · Aplicações</span>
+      <span class="grand__k">Subtotal · Revestimento</span>
       <span class="grand__v"><small>R$</small>362.308,65</span>
     </div>
 
@@ -953,7 +958,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   </div>
 
   <div class="runner" aria-hidden="true">
-    <span>Subtotal · Aplicações</span>
+    <span>Subtotal · Revestimento</span>
     <b>R$ 362.308,65</b>
   </div>
 </section>
@@ -1091,17 +1096,12 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       <span class="grand__v"><small>R$</small>3.203.979,00</span>
     </div>
 
-    <div class="grand" style="border-top-width:2px;margin-top:var(--space-16);padding-top:var(--space-8)">
-      <span class="grand__k" style="letter-spacing:var(--track-label)">Investimento total</span>
-      <span class="grand__v" style="font-size:clamp(2.2rem, 1.2rem + 3.6vw, 4rem)"><small>R$</small>3.566.287,65</span>
-    </div>
-
     <a class="next" href="#ch-05" style="margin-top:var(--space-12)">Condições <span class="next__arrow" aria-hidden="true">→</span></a>
   </div>
 
   <div class="runner" aria-hidden="true">
-    <span>Investimento total</span>
-    <b>R$ 3.566.287,65</b>
+    <span>Subtotal · Marcenaria fina</span>
+    <b>R$ 3.203.979,00</b>
   </div>
 </section>
 
@@ -1117,17 +1117,17 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     </div>
     <dl class="recap reveal">
       <div class="recap__row">
-        <dt class="recap__k">Aplicações<span class="recap__s">Piso · rodapé · forro</span></dt>
+        <dt class="recap__k">Revestimento Total<span class="recap__s">Piso · rodapé · forro</span></dt>
         <dd class="recap__v">R$ 362.308,65</dd>
       </div>
       <div class="recap__row">
-        <dt class="recap__k">Marcenaria fina<span class="recap__s">Painel · porta · marcenaria</span></dt>
+        <dt class="recap__k">Marcenaria fina Total<span class="recap__s">Painel · porta · marcenaria</span></dt>
         <dd class="recap__v">R$ 3.203.979,00</dd>
       </div>
     </dl>
 
-    <div class="grand reveal">
-      <span class="grand__k">Investimento total</span>
+    <div class="grand grand--total reveal">
+      <span class="grand__k">Investimento Geral total</span>
       <span class="grand__v"><small>R$</small>3.566.287,65</span>
     </div>
     <p class="recap__ref reveal">Matheus de Abreu Costantini · validade 30 dias</p>
