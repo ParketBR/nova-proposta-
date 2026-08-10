@@ -100,6 +100,9 @@
   --pad-x:clamp(1.25rem, 5vw, 5rem);
   --pad-y:clamp(1.75rem, 5vh, 4.5rem);
   --measure:64ch;
+  /* Largura máxima da coluna de conteúdo. Sem isto a tabela de investimento
+     estica até a borda em telas largas e o valor descola do descritivo. */
+  --content-max:76rem;
   --tap-min:44px;
   --field-h:46px;
   --radius:2px;                  /* cantos praticamente retos — arquitetônico */
@@ -293,7 +296,9 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 @media (min-width:1024px){ .chapter{ padding-left:var(--rail-w); padding-bottom:0; } }
 .chapter--dark{ background:var(--color-bg-inverse); color:var(--color-text-inverse); }
 
-.wrap{ padding:var(--pad-y) var(--pad-x); }
+/* O padding lateral cresce sozinho quando sobra viewport: o conteúdo fica
+   centrado e capado em --content-max, sem precisar de wrapper extra. */
+.wrap{ padding:var(--pad-y) max(var(--pad-x), (100% - var(--content-max)) / 2); }
 .wrap--tall{ min-height:100%; display:flex; flex-direction:column; justify-content:center; }
 
 /* ── Tipografia editorial ─────────────────────────────────────────── */
@@ -584,7 +589,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 .rooms i{ font-style:normal; font-variant-numeric:tabular-nums; color:var(--color-accent); }
 
 /* ═══ 03 · INVESTIMENTO ════════════════════════════════════════════ */
-.ledger{ margin-top:var(--space-8); font-variant-numeric:tabular-nums; }
+.ledger{ margin-top:var(--space-6); font-variant-numeric:tabular-nums; }
 .ledger caption{ text-align:left; }
 .ledger__head th{
   position:sticky; top:0; z-index:1;
@@ -598,7 +603,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 .ledger__head th:last-child{ text-align:right; }
 
 .cat td{
-  padding:var(--space-12) var(--space-2) var(--space-3);
+  padding:var(--space-8) var(--space-2) var(--space-2);
   border-bottom:1px solid var(--color-line-strong);
 }
 .cat__k{
@@ -611,7 +616,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 }
 .cat__s{ display:block; margin-top:var(--space-1); font-size:var(--text-sm); color:var(--color-text-faint); }
 
-.it td{ padding:var(--space-4) var(--space-2); border-bottom:1px solid var(--color-line); vertical-align:top; }
+.it td{ padding:var(--space-3) var(--space-2); border-bottom:1px solid var(--color-line); vertical-align:top; }
 .it{ transition:background var(--duration-fast) var(--ease-out); }
 .it:hover{ background:var(--color-bg-alt); }
 .it__n{ width:4.5rem; color:var(--color-text-faint); font-size:var(--text-sm); }
@@ -619,18 +624,18 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 .it__s{ display:block; margin-top:var(--space-1); font-size:var(--text-sm); color:var(--color-text-faint); }
 .it__v{ width:11rem; text-align:right; white-space:nowrap; font-weight:500; }
 
-.mid td{ padding:var(--space-3) var(--space-2); border-bottom:1px solid var(--color-line);
+.mid td{ padding:var(--space-2) var(--space-2); border-bottom:1px solid var(--color-line);
          font-size:var(--text-sm); color:var(--color-text-faint); font-style:italic; }
 .mid td:last-child{ text-align:right; white-space:nowrap; font-style:normal; }
 
-.sub td{ padding:var(--space-4) var(--space-2); border-bottom:1px solid var(--color-line-strong);
+.sub td{ padding:var(--space-3) var(--space-2); border-bottom:1px solid var(--color-line-strong);
          font-size:var(--text-2xs); font-weight:var(--weight-label); letter-spacing:var(--track-label); text-transform:uppercase; }
 .sub td:last-child{ text-align:right; white-space:nowrap; letter-spacing:0; font-size:var(--text-md); }
 
 .grand{
   display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between;
-  gap:var(--space-4); margin-top:var(--space-8);
-  padding:var(--space-6) var(--space-2); border-top:2px solid var(--color-text);
+  gap:var(--space-4); margin-top:var(--space-6);
+  padding:var(--space-4) var(--space-2); border-top:2px solid var(--color-text);
 }
 .grand__k{ font-size:var(--text-2xs); font-weight:var(--weight-label); letter-spacing:var(--track-label); text-transform:uppercase; }
 .grand__v{
@@ -646,13 +651,14 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   .runner{
     position:sticky; bottom:0; z-index:var(--z-sticky);
     display:flex; align-items:center; justify-content:space-between; gap:var(--space-4);
-    padding:var(--space-3) var(--pad-x);
+    /* Mesmo cálculo do .wrap — mantém o total alinhado à coluna de valores */
+    padding:var(--space-3) max(var(--pad-x), (100% - var(--content-max)) / 2);
     background:var(--color-bg);
     border-top:1px solid var(--color-line-strong);
     font-size:var(--text-2xs); font-weight:500; letter-spacing:var(--track-label); text-transform:uppercase;
     color:var(--color-text-faint);
   }
-  #ch-03 .wrap{ padding-bottom:calc(var(--pad-y) + 64px); }
+  #ch-03 .wrap, #ch-04 .wrap{ padding-bottom:calc(var(--pad-y) + 64px); }
   .runner b{
     font-size:var(--text-md); font-weight:var(--weight-body);
     letter-spacing:0; text-transform:none; color:var(--color-text);
@@ -666,25 +672,48 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   .ledger__head{ display:none; }
   .it td{ border:0; padding:0; }
   .it{ display:grid; grid-template-columns:auto 1fr; column-gap:var(--space-3);
-       padding:var(--space-4) 0; border-bottom:1px solid var(--color-line); }
+       padding:var(--space-3) 0; border-bottom:1px solid var(--color-line); }
   .it__n{ grid-row:1; font-size:var(--text-sm); }
   .it__d{ grid-row:1; }
   .it__v{ grid-column:1/-1; grid-row:2; width:auto; text-align:left;
           margin-top:var(--space-2); font-size:var(--text-md); }
   .it__v::before{ content:'R$ '; color:var(--color-text-faint); font-weight:400; }
-  .cat td{ padding:var(--space-12) 0 var(--space-3); }
+  .cat td{ padding:var(--space-8) 0 var(--space-2); }
   .mid{ padding:var(--space-3) 0; border-bottom:1px solid var(--color-line); }
   .mid td{ border:0; padding:0; }
   .mid td:last-child{ text-align:left; margin-top:var(--space-1); }
   .sub{ display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline;
-        gap:var(--space-2); padding:var(--space-4) 0; border-bottom:1px solid var(--color-line-strong); }
+        gap:var(--space-2); padding:var(--space-3) 0; border-bottom:1px solid var(--color-line-strong); }
   .sub td{ border:0; padding:0; }
   .sub td:empty{ display:none; }
   .sub td:last-child::before{ content:'R$ '; font-size:var(--text-sm); color:var(--color-text-faint); }
 }
 
-/* ═══ 04 · CONDIÇÕES ═══════════════════════════════════════════════ */
-.terms{ display:grid; gap:0; margin-top:var(--space-8); }
+/* ═══ 05 · CONDIÇÕES ═══════════════════════════════════════════════ */
+/* Resumo financeiro — os dois grupos reconvergem aqui, já que o
+   investimento está dividido entre os capítulos 03 e 04. */
+.recap{ display:grid; gap:0; margin-top:var(--space-6); }
+.recap__row{
+  display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between;
+  gap:var(--space-4); padding:var(--space-4) 0;
+  border-bottom:1px solid var(--color-line);
+}
+.recap__k{
+  display:flex; flex-direction:column; gap:var(--space-1);
+  font-size:var(--text-2xs); font-weight:var(--weight-label);
+  letter-spacing:var(--track-label); text-transform:uppercase;
+}
+.recap__s{ font-weight:400; color:var(--color-text-faint); letter-spacing:.1em; }
+.recap__v{
+  font-size:var(--text-md); font-weight:500;
+  font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+.recap__ref{
+  margin-top:var(--space-3); font-size:var(--text-2xs); font-weight:500;
+  letter-spacing:var(--track-label); text-transform:uppercase; color:var(--color-text-faint);
+}
+
+.terms{ display:grid; gap:0; margin-top:var(--space-6); }
 @media (min-width:768px){ .terms{ grid-template-columns:repeat(2,1fr); column-gap:var(--space-16); } }
 .terms__row{
   display:flex; flex-direction:column; gap:var(--space-2);
@@ -782,13 +811,14 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   <ol class="rail__list" id="railList">
     <li><a class="rail__item" href="#ch-01"><span class="rail__num">01</span><span class="rail__label">Inicio</span><span class="rail__tick"></span></a></li>
     <li><a class="rail__item" href="#ch-02"><span class="rail__num">02</span><span class="rail__label">Projeto</span><span class="rail__tick"></span></a></li>
-    <li><a class="rail__item" href="#ch-03"><span class="rail__num">03</span><span class="rail__label">Investimento</span><span class="rail__tick"></span></a></li>
-    <li><a class="rail__item" href="#ch-04"><span class="rail__num">04</span><span class="rail__label">Condições</span><span class="rail__tick"></span></a></li>
-    <li><a class="rail__item" href="#ch-05"><span class="rail__num">05</span><span class="rail__label">Confirmação</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-03"><span class="rail__num">03</span><span class="rail__label">Aplicações</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-04"><span class="rail__num">04</span><span class="rail__label">Marcenaria fina</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-05"><span class="rail__num">05</span><span class="rail__label">Condições</span><span class="rail__tick"></span></a></li>
+    <li><a class="rail__item" href="#ch-06"><span class="rail__num">06</span><span class="rail__label">Confirmação</span><span class="rail__tick"></span></a></li>
   </ol>
 
   <div class="rail__foot">
-    <span class="rail__pos"><b id="railPos">01</b> / 05</span>
+    <span class="rail__pos"><b id="railPos">01</b> / 06</span>
     <div class="rail__bar"><i id="railBar"></i></div>
   </div>
 </nav>
@@ -816,7 +846,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 
       <dl class="cover__meta reveal">
         <div><dt>Local</dt><dd>Jardim Paulista · São Paulo</dd></div>
-        <div><dt>Data</dt><dd>06 de agosto de 2026</dd></div>
+        <div><dt>Data</dt><dd>10 de agosto de 2026</dd></div>
         <div><dt>Validade</dt><dd>30 dias</dd></div>
       </dl>
     </div>
@@ -824,7 +854,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     <div class="cover__foot">
       <a class="next" href="#ch-02">Iniciar <span class="next__arrow" aria-hidden="true">→</span></a>
       <p style="font-size:var(--text-2xs);letter-spacing:var(--track-label);text-transform:uppercase;color:rgba(232,228,223,.45)">
-      Pisos, decks, zforros, painéis, portas e marcenaria em madeira nobre
+      Pisos, decks, forros, painéis, portas e marcenaria em madeira nobre
       </p>
     </div>
   </div>
@@ -846,28 +876,29 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       <div class="spec__row"><dt class="spec__k">Endereço</dt><dd class="spec__v">Rua Caconde, 471 · 4º A</dd></div>
       <div class="spec__row"><dt class="spec__k">Bairro</dt><dd class="spec__v">Jardim Paulista</dd></div>
       <div class="spec__row"><dt class="spec__k">Cidade</dt><dd class="spec__v">São Paulo · SP</dd></div>
-      <div class="spec__row"><dt class="spec__k">Data</dt><dd class="spec__v">06 de agosto de 2026</dd></div>
+      <div class="spec__row"><dt class="spec__k">Data</dt><dd class="spec__v">10 de agosto de 2026</dd></div>
       <div class="spec__row"><dt class="spec__k">Validade</dt><dd class="spec__v">30 dias</dd></div>
       <div class="spec__row"><dt class="spec__k">Garantia</dt><dd class="spec__v">10 anos</dd></div>
+      <div class="spec__row"><dt class="spec__k">Vendedor</dt><dd class="spec__v">Douglas</dd></div>
     </dl>
 
 
-    <a class="next reveal" href="#ch-03" style="margin-top:var(--space-12)">Investimento <span class="next__arrow" aria-hidden="true">→</span></a>
+    <a class="next reveal" href="#ch-03" style="margin-top:var(--space-12)">Aplicações <span class="next__arrow" aria-hidden="true">→</span></a>
   </div>
 </section>
 
 <!-- ═══════════════ 03 · INVESTIMENTO ═══════════════ -->
-<section class="chapter" id="ch-03" data-tone="paper" aria-label="03 Investimento">
+<section class="chapter" id="ch-03" data-tone="paper" aria-label="03 Aplicações">
   <div class="wrap">
-    <p class="eyebrow reveal"><span class="eyebrow__n">03</span> Investimento</p>
-    <h2 class="display display--sm reveal" style="margin-top:var(--space-6)">Composição do investimento</h2>
+    <p class="eyebrow reveal"><span class="eyebrow__n">03</span> Aplicações</p>
+    <h2 class="display display--sm reveal" style="margin-top:var(--space-6)">Piso, rodapé e forro</h2>
     <p class="lede reveal" style="margin-top:var(--space-4)">
       Proposta 99918 · Matheus de Abreu Costantini. Valores em reais, com insumos,
       instalação e gestão de obras inclusos em cada sistema.
     </p>
 
     <!-- ── Grupo A · Aplicações ── -->
-    <div class="section-head" style="margin-top:var(--space-16)">
+    <div class="section-head" style="margin-top:var(--space-8)">
       <span>A · Aplicações</span><span>Piso · rodapé · forro</span>
     </div>
     <table class="ledger" role="table">
@@ -918,8 +949,27 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       <span class="grand__v"><small>R$</small>362.308,65</span>
     </div>
 
+    <a class="next" href="#ch-04" style="margin-top:var(--space-12)">Marcenaria fina <span class="next__arrow" aria-hidden="true">→</span></a>
+  </div>
+
+  <div class="runner" aria-hidden="true">
+    <span>Subtotal · Aplicações</span>
+    <b>R$ 362.308,65</b>
+  </div>
+</section>
+
+<!-- ═══════════════ 04 · MARCENARIA FINA ═══════════════ -->
+<section class="chapter" id="ch-04" data-tone="paper" aria-label="04 Marcenaria fina">
+  <div class="wrap">
+    <p class="eyebrow reveal"><span class="eyebrow__n">04</span> Marcenaria fina</p>
+    <h2 class="display display--sm reveal" style="margin-top:var(--space-6)">Painel, porta e marcenaria</h2>
+    <p class="lede reveal" style="margin-top:var(--space-4)">
+      Peças sob medida em lâmina, laca, MDF e alumínio. Insumos, execução e
+      gestão de obras inclusos, nas mesmas condições do grupo anterior.
+    </p>
+
     <!-- ── Grupo B · Marcenaria fina ── -->
-    <div class="section-head" style="margin-top:var(--space-24)">
+    <div class="section-head" style="margin-top:var(--space-8)">
       <span>B · Marcenaria fina</span><span>Painel · porta · marcenaria</span>
     </div>
     <table class="ledger" role="table">
@@ -1046,7 +1096,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       <span class="grand__v" style="font-size:clamp(2.2rem, 1.2rem + 3.6vw, 4rem)"><small>R$</small>3.566.287,65</span>
     </div>
 
-    <a class="next" href="#ch-04" style="margin-top:var(--space-12)">Condições <span class="next__arrow" aria-hidden="true">→</span></a>
+    <a class="next" href="#ch-05" style="margin-top:var(--space-12)">Condições <span class="next__arrow" aria-hidden="true">→</span></a>
   </div>
 
   <div class="runner" aria-hidden="true">
@@ -1055,15 +1105,40 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   </div>
 </section>
 
-<!-- ═══════════════ 04 · CONDIÇÕES ═══════════════ -->
-<section class="chapter" id="ch-04" data-tone="paper" aria-label="04 Condições">
+<!-- ═══════════════ 05 · CONDIÇÕES ═══════════════ -->
+<section class="chapter" id="ch-05" data-tone="paper" aria-label="05 Condições">
   <div class="wrap wrap--tall">
-    <p class="eyebrow reveal"><span class="eyebrow__n">04</span> Condições</p>
-    <h2 class="display display--sm reveal" style="margin-top:var(--space-6)">Condições comerciais</h2>
+    <p class="eyebrow reveal"><span class="eyebrow__n">05</span> Condições</p>
+    <h2 class="display display--sm reveal" style="margin-top:var(--space-6)">Resumo e condições</h2>
 
+    <!-- ── Resumo financeiro ── -->
+    <div class="section-head reveal" style="margin-top:var(--space-8)">
+      <span>Resumo financeiro</span><span>Proposta 99918</span>
+    </div>
+    <dl class="recap reveal">
+      <div class="recap__row">
+        <dt class="recap__k">Aplicações<span class="recap__s">Piso · rodapé · forro</span></dt>
+        <dd class="recap__v">R$ 362.308,65</dd>
+      </div>
+      <div class="recap__row">
+        <dt class="recap__k">Marcenaria fina<span class="recap__s">Painel · porta · marcenaria</span></dt>
+        <dd class="recap__v">R$ 3.203.979,00</dd>
+      </div>
+    </dl>
+
+    <div class="grand reveal">
+      <span class="grand__k">Investimento total</span>
+      <span class="grand__v"><small>R$</small>3.566.287,65</span>
+    </div>
+    <p class="recap__ref reveal">Matheus de Abreu Costantini · validade 30 dias</p>
+
+    <!-- ── Condições comerciais ── -->
+    <div class="section-head reveal" style="margin-top:var(--space-16)">
+      <span>Condições comerciais</span><span>Prazos · garantia · pagamento</span>
+    </div>
     <dl class="terms reveal">
       <div class="terms__row"><dt class="terms__k">Pagamento</dt><dd class="terms__v">A combinar</dd></div>
-      <div class="terms__row"><dt class="terms__k">Validade da proposta</dt><dd class="terms__v">30 dias<span class="terms__note"> · a partir de 06 de agosto de 2026</span></dd></div>
+      <div class="terms__row"><dt class="terms__k">Validade da proposta</dt><dd class="terms__v">30 dias<span class="terms__note"> · a partir de 10 de agosto de 2026</span></dd></div>
       <div class="terms__row"><dt class="terms__k">Prazo de entrega</dt><dd class="terms__v">120 dias<span class="terms__note"> · após a contratação</span></dd></div>
       <div class="terms__row"><dt class="terms__k">Prazo de execução</dt><dd class="terms__v">120 dias<span class="terms__note"> · após a entrega do material</span></dd></div>
       <div class="terms__row"><dt class="terms__k">Instalação</dt><dd class="terms__v">Inclusa<span class="terms__note"> · com gestão de obras, em todos os sistemas</span></dd></div>
@@ -1086,16 +1161,16 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       Itens marcados como “confirmar” dependem de medição final em obra.
     </p>
 
-    <a class="next reveal" href="#ch-05" style="margin-top:var(--space-12)">Confirmação <span class="next__arrow" aria-hidden="true">→</span></a>
+    <a class="next reveal" href="#ch-06" style="margin-top:var(--space-12)">Confirmação <span class="next__arrow" aria-hidden="true">→</span></a>
   </div>
 </section>
 
-<!-- ═══════════════ 05 · CONFIRMAÇÃO ═══════════════ -->
-<section class="chapter chapter--dark" id="ch-05" data-tone="dark" aria-label="05 Confirmação">
+<!-- ═══════════════ 06 · CONFIRMAÇÃO ═══════════════ -->
+<section class="chapter chapter--dark" id="ch-06" data-tone="dark" aria-label="06 Confirmação">
   <div class="wrap wrap--tall" id="closeWrap">
 
     <div id="closeIntro" class="close__hero">
-      <p class="eyebrow reveal"><span class="eyebrow__n">05</span> Confirmação</p>
+      <p class="eyebrow reveal"><span class="eyebrow__n">06</span> Confirmação</p>
       <h2 class="display reveal">Vamos começar.</h2>
       <p class="lede reveal">
         Ao confirmar, preparamos o contrato e enviamos os documentos para assinatura digital.
@@ -1111,7 +1186,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     </div>
 
     <div id="closeForm" hidden>
-      <p class="eyebrow"><span class="eyebrow__n">05</span> Confirmação</p>
+      <p class="eyebrow"><span class="eyebrow__n">06</span> Confirmação</p>
       <h2 class="display display--sm" style="margin-top:var(--space-6)">Dados para o contrato</h2>
       <p class="lede" style="margin-top:var(--space-4);max-width:52ch">
         Preencha os campos abaixo. Em poucos minutos enviaremos os documentos para assinatura digital.
