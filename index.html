@@ -758,6 +758,9 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   display:flex; flex-direction:column; gap:var(--space-2);
   padding:var(--space-6) 0; border-bottom:1px solid var(--color-line);
 }
+/* últimas linhas (1 col mobile, 2 col desktop) não duplicam com o .bank abaixo */
+.terms__row:last-child,
+.terms__row:nth-last-child(2){ border-bottom:0; }
 .terms__k{
   font-size:var(--text-2xs); font-weight:var(--weight-label); letter-spacing:var(--track-label);
   text-transform:uppercase; color:var(--color-accent-ink);
