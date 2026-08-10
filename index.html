@@ -364,6 +364,11 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 }
 .chapter--dark .section-head{ border-color:var(--color-line-inverse); }
 .section-head span:last-child{ font-weight:400; color:var(--color-text-faint); letter-spacing:.1em; }
+/* Lado a lado os dois rótulos não cabem em 375px e cada um quebra em duas
+   linhas; empilhados ocupam a mesma altura e continuam legíveis. */
+@media (max-width:600px){
+  .section-head{ flex-direction:column; align-items:flex-start; gap:var(--space-1); }
+}
 
 /* ── Reveal: só camadas decorativas; sem JS tudo aparece ──────────── */
 .js .reveal{ opacity:0; transform:translateY(10px); }
@@ -669,7 +674,9 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 /* Total geral — mantém o peso, já que agora aparece uma vez só */
 .grand--total{ border-top-width:2px; padding-top:var(--space-6); }
 .grand--total .grand__v{ font-size:clamp(1.6rem, 1.1rem + 1.8vw, 2.6rem); }
-.grand__v small{ font-family:var(--font-sans); font-size:.36em; font-weight:500;
+/* O piso de .7rem impede que o "R$" some no mobile: .36em de um subtotal
+   de 20px daria 7px, ilegível. */
+.grand__v small{ font-family:var(--font-sans); font-size:max(.36em, .7rem); font-weight:500;
                  color:var(--color-text-faint); margin-right:.5em; letter-spacing:.06em; }
 
 /* Total corrente — orientação comercial durante a rolagem longa (apenas desktop) */
@@ -1256,15 +1263,15 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
         </div>
         <div class="field">
           <label for="cf_num">Número *</label>
-          <input id="cf_num" name="num" required placeholder="471">
+          <input id="cf_num" name="num" required inputmode="numeric" placeholder="471">
         </div>
         <div class="field">
           <label for="cf_comp">Complemento</label>
-          <input id="cf_comp" name="comp" placeholder="Apto, sala…">
+          <input id="cf_comp" name="comp" autocomplete="address-line2" placeholder="Apto, sala…">
         </div>
         <div class="field full">
           <label for="cf_bairro">Bairro *</label>
-          <input id="cf_bairro" name="bairro" required placeholder="Bairro">
+          <input id="cf_bairro" name="bairro" required autocomplete="address-level3" placeholder="Bairro">
         </div>
         <div class="field">
           <label for="cf_cidade">Cidade *</label>
