@@ -1342,7 +1342,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   if (video) {
     var SRC = {
       desktop: 'https://parket.com.br/wp-content/uploads/2026/04/Parket-HeroNew.mp4',
-      mobile:  '/assets/Heromobile-v3.mp4'
+      mobile:  'https://parket.com.br/wp-content/uploads/2026/04/Parket-HeroNew.mp4'
     };
     var tier = null;
     var ready = function () { video.classList.add('is-ready'); };
@@ -1376,6 +1376,29 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   var total    = chapters.length;
   var current  = -1;
 
+  /* Auto-avanço: cap 01 (8s) → 02, cap 02 (10s) → 03. A partir do 03 o usuário
+     navega manualmente. Qualquer interação (scroll, toque, teclado, clique)
+     cancela o auto-avanço até o fim da sessão. */
+  var AUTO_DELAYS = { 0: 8000, 1: 10000 };
+  var _autoTimer  = null;
+  var _autoOff    = false;
+  function scheduleAuto(i) {
+    clearTimeout(_autoTimer);
+    if (_autoOff) return;
+    var delay = AUTO_DELAYS[i];
+    if (!delay || !chapters[i + 1]) return;
+    _autoTimer = setTimeout(function () {
+      if (_autoOff) return;
+      try { chapters[i + 1].scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) {}
+    }, delay);
+  }
+  ['wheel', 'touchstart', 'keydown', 'mousedown', 'click'].forEach(function (ev) {
+    window.addEventListener(ev, function () {
+      _autoOff = true;
+      clearTimeout(_autoTimer);
+    }, { once: true, passive: true, capture: true });
+  });
+
   function setCurrent(i) {
     if (i === current) return;
     current = i;
@@ -1393,6 +1416,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     if (items[i] && items[i].scrollIntoView && window.innerWidth < 1024) {
       items[i].scrollIntoView({ block: 'nearest', inline: 'center' });
     }
+    scheduleAuto(i);
   }
 
   if ('IntersectionObserver' in window) {
