@@ -674,9 +674,9 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   font-weight:var(--weight-display); font-size:clamp(1.25rem, .95rem + 1.1vw, 1.75rem);
   line-height:1; font-variant-numeric:tabular-nums; white-space:nowrap;
 }
-/* Total geral — mantém o peso, já que agora aparece uma vez só */
+/* Total geral — mesmo corpo dos subtotais; o que o distingue é a régua
+   mais grossa e o respiro acima, não o tamanho do número. */
 .grand--total{ border-top-width:2px; padding-top:var(--space-6); }
-.grand--total .grand__v{ font-size:clamp(1.6rem, 1.1rem + 1.8vw, 2.6rem); }
 /* O piso de .7rem impede que o "R$" some no mobile: .36em de um subtotal
    de 20px daria 7px, ilegível. */
 .grand__v small{ font-family:var(--font-sans); font-size:max(.36em, .7rem); font-weight:500;
@@ -772,7 +772,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 .bank__e{ margin-top:var(--space-3); font-size:var(--text-sm); color:var(--color-text-faint); }
 
 /* ═══ 05 · CONFIRMAÇÃO ═════════════════════════════════════════════ */
-.close__hero{ display:flex; flex-direction:column; gap:var(--space-6); max-width:36ch; }
+.close__hero{     align-self:anchor-center; display:flex; flex-direction:column; gap:var(--space-6); max-width:36ch; }
 .form{ display:grid; grid-template-columns:repeat(2,1fr); gap:var(--space-4); margin-top:var(--space-8); }
 .form .full{ grid-column:1/-1; }
 @media (max-width:560px){ .form{ grid-template-columns:1fr; } }
@@ -904,10 +904,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     <h2 class="reveal" style="margin-top:var(--space-6)">
       <img class="project__logo" src="logo/logo-parket-lg.png" alt="Parket" width="461" height="101">
     </h2>
-    <p class="lede reveal" style="margin-top:var(--space-6)">
-      Especificação completa para a unidade 4A: do piso ao forro, do painel de parede
-      às portas e à marcenaria fina. Uma única linguagem de material em todos os ambientes.
-    </p>
+
 
     <dl class="spec reveal">
       <div class="spec__row"><dt class="spec__k">Contratante</dt><dd class="spec__v">Matheus de Abreu Costantini</dd></div>
