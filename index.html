@@ -1803,26 +1803,39 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
             html += '<tr class="mid" role="row"><td role="cell"></td><td role="cell">' + esc(midTxt) + '</td><td role="cell">' + fmtBrl(midValor) + '</td></tr>';
           }
         }
-        // Detalhamento de projeto consolidado (renomeia RECORTES → DETALHAMENTO)
+        // Detalhamento de projeto: 1 item principal N.M + sub-itens N.M.K por recorte (parse RECDATA JSON)
         if (detalhes.length > 0) {
           localIdx++;
           var detTotal = detalhes.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
-          // Junta todas as linhas de detalhamento (menos a primeira "RECORTES" de cada)
-          var detLines = [];
-          detalhes.forEach(function(it){
-            var d = String(it.descritivo || '').replace(/\\n/g, '\n');
-            var ls = d.split(/\r?\n/).map(function(l){ return l.trim(); })
-              .filter(function(l){ return l && !/^RECORTES\b/i.test(l) && !/^__[A-Z_]+__:/i.test(l); });
-            detLines = detLines.concat(ls);
-          });
+          var detIdx = localIdx; // guarda o número base pros sub-itens
           html += '<tr class="it" role="row">' +
-            '<td class="it__n" role="cell">' + esc(chapterIdx + '.' + localIdx) + '</td>' +
-            '<td class="it__d" role="cell">' +
-              '<span class="it__t">DETALHAMENTO DE PROJETO</span>' +
-              (detLines.length ? '<span class="it__s">' + esc(detLines.join('\n').toUpperCase()).replace(/\n/g,'<br>') + '</span>' : '') +
-            '</td>' +
+            '<td class="it__n" role="cell">' + esc(chapterIdx + '.' + detIdx) + '</td>' +
+            '<td class="it__d" role="cell"><span class="it__t">DETALHAMENTO DE PROJETO</span></td>' +
             '<td class="it__v" role="cell">' + fmtBrl(detTotal) + '</td></tr>';
           subtotal += detTotal;
+          // Extrai sub-recortes de RECDATA JSON (agrega entre todos os detalhes)
+          var subItems = [];
+          detalhes.forEach(function(it){
+            var m = String(it.descritivo || '').match(/__RECDATA__:\s*(\{[\s\S]*?\})/i);
+            if (!m) return;
+            try {
+              var rec = JSON.parse(m[1]);
+              Object.keys(rec).forEach(function(k){
+                var r = rec[k]; if (!r || !r.NOME) return;
+                var qtd = Number(r.QTD || 0);
+                var preco = Number(r.P || 0);
+                var val = qtd * preco;
+                var u = r.U || 'UN';
+                subItems.push({ nome: String(r.NOME).toUpperCase(), qtd: qtd, u: u, valor: val });
+              });
+            } catch(_) {}
+          });
+          subItems.forEach(function(s, i){
+            html += '<tr class="it" role="row">' +
+              '<td class="it__n" role="cell" style="padding-left:2rem;color:var(--color-text-faint)">' + esc(chapterIdx + '.' + detIdx + '.' + (i+1)) + '</td>' +
+              '<td class="it__d" role="cell"><span class="it__t" style="font-weight:400;color:var(--color-text-faint)">' + esc(s.qtd + ' ' + s.u.toUpperCase() + ' · ' + s.nome) + '</span></td>' +
+              '<td class="it__v" role="cell" style="color:var(--color-text-faint)">' + fmtBrl(s.valor) + '</td></tr>';
+          });
         }
         // Insumos consolidado (por SUBTIPO)
         if (insumos.length > 0) {
