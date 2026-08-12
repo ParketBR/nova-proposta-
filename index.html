@@ -1760,14 +1760,14 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     // head. Cada SUBTIPO tem seus próprios produtos + mid row + detalhamento + insumos +
     // instalação (NÃO mistura RIPADO com MUXARABI). No fim: 1 "Valor parcial do X".
     function renderHead(head, groupData, chapterIdx) {
-      var headUpper = String(head).toUpperCase();
+      var headUpper = String(head).replace(/_/g, ' ').toUpperCase();
       var html = '';
       var subtotal = 0;
       var localIdx = 0;
       // Renderiza cada subtipo independentemente
       groupData.subKeys.forEach(function(catKey){
         var parts = catKey.split('||');
-        var subName = parts[1] ? String(parts[1]).toUpperCase() : '';
+        var subName = parts[1] ? String(parts[1]).replace(/_/g, ' ').toUpperCase() : '';
         var sorted = groupData.subtypes[catKey].slice().sort(function(a,b){
           var ka = installSort(a.descritivo), kb = installSort(b.descritivo);
           if (ka !== kb) return ka - kb;
