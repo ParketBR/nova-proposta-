@@ -1811,12 +1811,13 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
             try {
               var rec = JSON.parse(m[1]);
               Object.keys(rec).forEach(function(k){
-                var r = rec[k]; if (!r || !r.NOME) return;
-                var qtd = Number(r.QTD || 0);
-                var preco = Number(r.P || 0);
-                var val = qtd * preco;
-                var u = r.U || 'UN';
-                subItems.push({ nome: String(r.NOME).toUpperCase(), qtd: qtd, u: u, valor: val });
+                var r = rec[k]; if (!r) return;
+                // Data tem keys em UPPER (NOME, U, P, QTD) OU lower (nome, u, p, qtd)
+                var nome = r.NOME || r.nome; if (!nome) return;
+                var qtd = Number(r.QTD || r.qtd || 0);
+                var preco = Number(r.P || r.p || 0);
+                var u = r.U || r.u || 'UN';
+                subItems.push({ nome: String(nome).toUpperCase(), qtd: qtd, u: u, valor: qtd * preco });
               });
             } catch(_) {}
           });
