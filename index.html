@@ -1748,9 +1748,14 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
         return (a.ordem||0) - (b.ordem||0);
       });
       var subtotal = 0;
-      // Divide em produto vs aux (insumos/instalação)
-      var produtoItens = [], auxItens = [];
-      sorted.forEach(function(it){ (installSort(it.descritivo) > 0 ? auxItens : produtoItens).push(it); });
+      // Divide em produto vs aux (insumos vs instalação) CONSOLIDADOS
+      var produtoItens = [], insumoItens = [], instalItens = [];
+      sorted.forEach(function(it){
+        var k = installSort(it.descritivo);
+        if (k === 1) insumoItens.push(it);
+        else if (k === 2) instalItens.push(it);
+        else produtoItens.push(it);
+      });
       var localIdx = 0;
       produtoItens.forEach(function(it){
         localIdx++;
@@ -1767,11 +1772,26 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
           html += '<tr class="mid" role="row"><td role="cell"></td><td role="cell">' + esc(midTxt) + '</td><td role="cell">' + fmtBrl(midValor) + '</td></tr>';
         }
       }
-      auxItens.forEach(function(it){
+      // Consolida insumos em 1 linha (soma valores)
+      if (insumoItens.length > 0) {
         localIdx++;
-        html += renderItem(startIdx + '.' + localIdx, it);
-        subtotal += Number(it.valor || 0);
-      });
+        var insumoTotal = insumoItens.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
+        html += '<tr class="it" role="row">' +
+          '<td class="it__n" role="cell">' + esc(startIdx + '.' + localIdx) + '</td>' +
+          '<td class="it__d" role="cell"><span class="it__t">Insumos</span></td>' +
+          '<td class="it__v" role="cell">' + fmtBrl(insumoTotal) + '</td></tr>';
+        subtotal += insumoTotal;
+      }
+      // Consolida instalação em 1 linha (soma valores)
+      if (instalItens.length > 0) {
+        localIdx++;
+        var instalTotal = instalItens.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
+        html += '<tr class="it" role="row">' +
+          '<td class="it__n" role="cell">' + esc(startIdx + '.' + localIdx) + '</td>' +
+          '<td class="it__d" role="cell"><span class="it__t">Instalação e gestão de obras</span></td>' +
+          '<td class="it__v" role="cell">' + fmtBrl(instalTotal) + '</td></tr>';
+        subtotal += instalTotal;
+      }
       html += '<tr class="sub" role="row"><td role="cell"></td>' +
         '<td role="cell">Parcial · ' + esc(catName.toLowerCase()) + '</td>' +
         '<td role="cell">' + fmtBrl(subtotal) + '</td></tr>';
