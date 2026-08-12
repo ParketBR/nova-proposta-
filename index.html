@@ -1624,7 +1624,10 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   };
   var H = { apikey: SUPA.anon, Authorization: 'Bearer ' + SUPA.anon };
 
-  var CH03_CATS = ['PISO', 'RODAPÉ', 'RODAPE', 'FORRO', 'REVESTIMENTO', 'DECK'];
+  // Ch03 = Revestimento (piso/rodapé/forro/deck)
+  // Ch04 = Marcenaria fina — TUDO que não é ch03 cai aqui:
+  //        painel, porta, marcenaria, adega, escada, brise, sauna, revestimento (wall), blindada, moldura_vidro, etc
+  var CH03_CATS = ['PISO', 'RODAPÉ', 'RODAPE', 'FORRO', 'DECK'];
   var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   var fmtBrl = function(n){ return Number(n||0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
   var dataFmt = function(iso){ try { return new Date(iso).toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' }); } catch(_){ return ''; } };
