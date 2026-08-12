@@ -1711,7 +1711,8 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       var lines = desc.split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean);
       var titleRaw = lines[0] || '';
       var rest = lines.slice(1);
-      var restText = rest.join(' · ');
+      // Junta demais linhas com <br> pra preservar separação vertical (não " · ")
+      var restText = rest.join('\n');
       var split = splitObs(restText);
       var subtitle = split.text;
       var obs = split.obs;
@@ -1719,14 +1720,18 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       var upperTitle = titleRaw.toUpperCase();
       var isInsumo = /^INSUMOS/.test(upperTitle);
       var isInstal = /INSTALAÇÃO|INSTALACAO/.test(upperTitle);
-      var title = (isInsumo ? 'Insumos' : isInstal ? 'Instalação e gestão de obras' : titleCase(titleRaw));
+      // Mantém texto RAW da data (CAPS). Só sobrescreve labels de insumo/instalação.
+      var title = (isInsumo ? 'INSUMOS' : isInstal ? 'INSTALAÇÃO E GESTÃO DE OBRAS' : titleRaw);
       if (isInsumo || isInstal) { subtitle = ''; obs = ''; }
+      // Preserva quebras de linha internas convertendo \n em <br>
+      var subHtml = subtitle ? esc(subtitle).replace(/\n/g, '<br>') : '';
+      var obsHtml = obs ? esc(obs) : '';
       return '<tr class="it" role="row">' +
         '<td class="it__n" role="cell">' + esc(itNum) + '</td>' +
         '<td class="it__d" role="cell">' +
           '<span class="it__t">' + esc(title) + '</span>' +
-          (subtitle ? '<span class="it__s">' + esc(lower(subtitle)) + '</span>' : '') +
-          (obs ? '<span class="it__o">' + esc(lower(obs)) + '</span>' : '') +
+          (subHtml ? '<span class="it__s">' + subHtml + '</span>' : '') +
+          (obsHtml ? '<span class="it__o">' + obsHtml + '</span>' : '') +
         '</td>' +
         '<td class="it__v" role="cell">' + fmtBrl(it.valor) + '</td>' +
       '</tr>';
@@ -1735,8 +1740,9 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     // Renderiza um bloco categoria (header + itens + parcial)
     function renderCategoria(catKey, itensList, startIdx) {
       var parts = catKey.split('||');
-      var catName = titleCase(parts[0] || '');
-      var catSpec = parts[1] ? titleCase(parts[1]) : '';
+      // Mantém RAW (CAPS) igual PGSTRUCT35 antigo
+      var catName = String(parts[0] || '').toUpperCase();
+      var catSpec = parts[1] ? String(parts[1]).toUpperCase() : '';
       // 3o segmento (ex: 15/3 × 19 × 190CM) fica escondido — polui o header
       var html = '<tr class="cat" role="row"><td colspan="3" role="cell">' +
         '<span class="cat__k">' + esc(catName) + '</span>' +
@@ -1793,7 +1799,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
         subtotal += instalTotal;
       }
       html += '<tr class="sub" role="row"><td role="cell"></td>' +
-        '<td role="cell">Parcial · ' + esc(catName.toLowerCase()) + '</td>' +
+        '<td role="cell">Valor parcial do ' + esc(catName) + '</td>' +
         '<td role="cell">' + fmtBrl(subtotal) + '</td></tr>';
       return { html: html, subtotal: subtotal, catCount: 1 };
     }
