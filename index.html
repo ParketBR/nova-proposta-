@@ -1635,7 +1635,14 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   // Title Case: primeira letra de cada palavra maiúscula, resto minúsculo. Respeita separadores /·-.
   var titleCase = function(s){ return String(s||'').toLowerCase().replace(/(^|[\s\/·\-\(])(\S)/g, function(_,p,l){ return p + l.toUpperCase(); }); };
   var lower = function(s){ return String(s||'').toLowerCase(); };
-  var installSort = function(d){ var u = (d||'').toUpperCase(); if (/^INSUMOS\b/.test(u) || u.indexOf('\nINSUMOS') >= 0) return 1; if (u.indexOf('INSTALAÇÃO') >= 0 || u.indexOf('INSTALACAO') >= 0) return 2; return 0; };
+  // Classifica item: 0=produto, 5=detalhamento (RECORTES), 10=insumos, 20=instalação
+  var installSort = function(d){
+    var u = (d||'').toUpperCase();
+    if (u.indexOf('INSTALAÇÃO') >= 0 || u.indexOf('INSTALACAO') >= 0) return 20;
+    if (/^INSUMOS\b/.test(u) || u.indexOf('\nINSUMOS') >= 0) return 10;
+    if (/^RECORTES\b/.test(u) || u.indexOf('\nRECORTES') >= 0) return 5;
+    return 0;
+  };
 
   // Extrai OBS: xxx do texto (se existir); retorna { text, obs }
   function splitObs(text) {
@@ -1749,17 +1756,15 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       '</tr>';
     }
 
-    // Renderiza HEAD completo (PISO, PORTA, etc). Numeração contínua N.1, N.2 ...
-    // dentro do head, mesmo com múltiplos subtipos. Insumos+Instalação consolidados
-    // no fim de tudo. 1 "Valor parcial do X" único.
+    // Renderiza HEAD completo (PISO, PORTA, etc). Numeração contínua N.M dentro do
+    // head. Cada SUBTIPO tem seus próprios produtos + mid row + detalhamento + insumos +
+    // instalação (NÃO mistura RIPADO com MUXARABI). No fim: 1 "Valor parcial do X".
     function renderHead(head, groupData, chapterIdx) {
       var headUpper = String(head).toUpperCase();
       var html = '';
       var subtotal = 0;
       var localIdx = 0;
-      // Separa produto vs aux somando entre TODOS os subtipos
-      var allProduto = [], allInsumo = [], allInstal = [];
-      // Preserva ordem: pra cada subtipo (na ordem que veio), renderiza cat header + produtos
+      // Renderiza cada subtipo independentemente
       groupData.subKeys.forEach(function(catKey){
         var parts = catKey.split('||');
         var subName = parts[1] ? String(parts[1]).toUpperCase() : '';
@@ -1768,57 +1773,78 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
           if (ka !== kb) return ka - kb;
           return (a.ordem||0) - (b.ordem||0);
         });
-        var produtos = [];
+        var produtos = [], detalhes = [], insumos = [], instals = [];
         sorted.forEach(function(it){
           var k = installSort(it.descritivo);
-          if (k === 1) allInsumo.push(it);
-          else if (k === 2) allInstal.push(it);
+          if (k === 20) instals.push(it);
+          else if (k === 10) insumos.push(it);
+          else if (k === 5) detalhes.push(it);
           else produtos.push(it);
         });
-        // Só renderiza header do subtipo se tem produtos nele
-        if (produtos.length > 0) {
+        // Header do subtipo (SEMPRE — inclui casos sem produto ex. só detalhamento)
+        if (produtos.length + detalhes.length + insumos.length + instals.length > 0) {
           html += '<tr class="cat" role="row"><td colspan="3" role="cell">' +
             '<span class="cat__k">' + esc(headUpper) + '</span>' +
             (subName ? '<span class="cat__n">' + esc(subName) + '</span>' : '') +
             '</td></tr>';
-          produtos.forEach(function(it){
-            localIdx++;
-            html += renderItem(chapterIdx + '.' + localIdx, it);
-            subtotal += Number(it.valor || 0);
-            allProduto.push(it);
+        }
+        produtos.forEach(function(it){
+          localIdx++;
+          html += renderItem(chapterIdx + '.' + localIdx, it);
+          subtotal += Number(it.valor || 0);
+        });
+        // Mid row: metragem real total do SUBTIPO (só se ≥2 produtos com dados)
+        if (produtos.length >= 2) {
+          var m = extractMetragemTotal(produtos);
+          if (m && m.reais > 0) {
+            var midTxt = 'METRAGEM REAL TOTAL ' + m.reais.toFixed(0) + ' M²';
+            if (m.perdaPerc > 0 && m.cobrada > m.reais) midTxt += ' + ' + m.perdaPerc + '% DE PERDA = ' + m.cobrada.toFixed(0) + ' M²';
+            var midValor = produtos.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
+            html += '<tr class="mid" role="row"><td role="cell"></td><td role="cell">' + esc(midTxt) + '</td><td role="cell">' + fmtBrl(midValor) + '</td></tr>';
+          }
+        }
+        // Detalhamento de projeto consolidado (renomeia RECORTES → DETALHAMENTO)
+        if (detalhes.length > 0) {
+          localIdx++;
+          var detTotal = detalhes.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
+          // Junta todas as linhas de detalhamento (menos a primeira "RECORTES" de cada)
+          var detLines = [];
+          detalhes.forEach(function(it){
+            var d = String(it.descritivo || '').replace(/\\n/g, '\n');
+            var ls = d.split(/\r?\n/).map(function(l){ return l.trim(); })
+              .filter(function(l){ return l && !/^RECORTES\b/i.test(l) && !/^__[A-Z_]+__:/i.test(l); });
+            detLines = detLines.concat(ls);
           });
+          html += '<tr class="it" role="row">' +
+            '<td class="it__n" role="cell">' + esc(chapterIdx + '.' + localIdx) + '</td>' +
+            '<td class="it__d" role="cell">' +
+              '<span class="it__t">DETALHAMENTO DE PROJETO</span>' +
+              (detLines.length ? '<span class="it__s">' + esc(detLines.join('\n').toUpperCase()).replace(/\n/g,'<br>') + '</span>' : '') +
+            '</td>' +
+            '<td class="it__v" role="cell">' + fmtBrl(detTotal) + '</td></tr>';
+          subtotal += detTotal;
+        }
+        // Insumos consolidado (por SUBTIPO)
+        if (insumos.length > 0) {
+          localIdx++;
+          var insumoTotal = insumos.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
+          html += '<tr class="it" role="row">' +
+            '<td class="it__n" role="cell">' + esc(chapterIdx + '.' + localIdx) + '</td>' +
+            '<td class="it__d" role="cell"><span class="it__t">INSUMOS</span></td>' +
+            '<td class="it__v" role="cell">' + fmtBrl(insumoTotal) + '</td></tr>';
+          subtotal += insumoTotal;
+        }
+        // Instalação consolidado (por SUBTIPO)
+        if (instals.length > 0) {
+          localIdx++;
+          var instalTotal = instals.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
+          html += '<tr class="it" role="row">' +
+            '<td class="it__n" role="cell">' + esc(chapterIdx + '.' + localIdx) + '</td>' +
+            '<td class="it__d" role="cell"><span class="it__t">INSTALAÇÃO E GESTÃO DE OBRAS</span></td>' +
+            '<td class="it__v" role="cell">' + fmtBrl(instalTotal) + '</td></tr>';
+          subtotal += instalTotal;
         }
       });
-      // Mid row: metragem real total agregada (só se tem ≥2 produtos com dados)
-      if (allProduto.length >= 2) {
-        var m = extractMetragemTotal(allProduto);
-        if (m && m.reais > 0) {
-          var midTxt = 'METRAGEM REAL TOTAL ' + m.reais.toFixed(0) + ' M²';
-          if (m.perdaPerc > 0 && m.cobrada > m.reais) midTxt += ' + ' + m.perdaPerc + '% DE PERDA = ' + m.cobrada.toFixed(0) + ' M²';
-          var midValor = allProduto.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
-          html += '<tr class="mid" role="row"><td role="cell"></td><td role="cell">' + esc(midTxt) + '</td><td role="cell">' + fmtBrl(midValor) + '</td></tr>';
-        }
-      }
-      // Insumos consolidado (1 linha)
-      if (allInsumo.length > 0) {
-        localIdx++;
-        var insumoTotal = allInsumo.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
-        html += '<tr class="it" role="row">' +
-          '<td class="it__n" role="cell">' + esc(chapterIdx + '.' + localIdx) + '</td>' +
-          '<td class="it__d" role="cell"><span class="it__t">INSUMOS</span></td>' +
-          '<td class="it__v" role="cell">' + fmtBrl(insumoTotal) + '</td></tr>';
-        subtotal += insumoTotal;
-      }
-      // Instalação consolidado (1 linha)
-      if (allInstal.length > 0) {
-        localIdx++;
-        var instalTotal = allInstal.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
-        html += '<tr class="it" role="row">' +
-          '<td class="it__n" role="cell">' + esc(chapterIdx + '.' + localIdx) + '</td>' +
-          '<td class="it__d" role="cell"><span class="it__t">INSTALAÇÃO E GESTÃO DE OBRAS</span></td>' +
-          '<td class="it__v" role="cell">' + fmtBrl(instalTotal) + '</td></tr>';
-        subtotal += instalTotal;
-      }
       // Parcial único do head
       html += '<tr class="sub" role="row"><td role="cell"></td>' +
         '<td role="cell">Valor parcial do ' + esc(headUpper) + '</td>' +
