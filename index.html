@@ -1582,9 +1582,21 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 })();
 </script>
 
-<!-- ═══════════════ SIM-LOADER — PKT-NOVA-PROPOSTA-DATA-20260812 ═══════════════ -->
+<!-- ═══════════════ SIM-LOADER — PKT-NOVA-PROPOSTA-DATA-20260812-V2 ═══════════════ -->
 <!-- Quando ?sim_id=<uuid> presente (e != mockup), busca dados reais e reescreve
-     header + ledger. Sem sim_id: mockup estático (Amauri/JHSF) fica como está. -->
+     header + ledger. Sem sim_id: mockup estático (Amauri/JHSF) fica como está.
+
+     Regras de rendering (port simplificado do PGSTRUCT35):
+     - descritivo linha 1 = ambiente (Title Case)
+     - linhas 2..N = detalhes → subtitle (lowercase, join com ·)
+     - "OBS: xxx" (case-insensitive) sai do texto e vira <span class="it__o">
+     - "MEDIDAS (...). METRAGEM TOTAL ...m²." fica no subtitle
+     - Se meta.descritivo_fixo=true → texto raw sem parsing (só \n → <br>)
+     - Se meta.ocultar_dim=true → remove MEDIDAS/METRAGEM
+     - PORTA||SUBTIPO já vira 1 header por subtipo (natural pelo split ||)
+     - Categorias de logística (LOG*/TRANSPORTE) somam em logisticaTotal
+     - Categorias OBS* somam em obsGeral
+     - Numeração: contínua (1..N) por chapter, começando em 1 -->
 <script>
 (function(){
   var MOCK_ID = 'aaaa1111-2222-4333-8444-202608060001';
@@ -1598,12 +1610,41 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   };
   var H = { apikey: SUPA.anon, Authorization: 'Bearer ' + SUPA.anon };
 
-  var CH03_CATS = ['PISO', 'RODAPÉ', 'RODAPE', 'FORRO'];
+  var CH03_CATS = ['PISO', 'RODAPÉ', 'RODAPE', 'FORRO', 'REVESTIMENTO', 'DECK'];
   var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   var fmtBrl = function(n){ return Number(n||0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
   var dataFmt = function(iso){ try { return new Date(iso).toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' }); } catch(_){ return ''; } };
-  var cap = function(s){ return String(s||'').toLowerCase().replace(/(^|[\s\/·\-])(\S)/g, function(m,p,l){ return p + l.toUpperCase(); }); };
-  var installSort = function(d){ var u = (d||'').toUpperCase(); if (/^INSUMOS\b/.test(u) || u.indexOf('\nINSUMOS') >= 0) return 1; if (u.indexOf('INSTALAÇÃO') >= 0) return 2; return 0; };
+  // Title Case: primeira letra de cada palavra maiúscula, resto minúsculo. Respeita separadores /·-.
+  var titleCase = function(s){ return String(s||'').toLowerCase().replace(/(^|[\s\/·\-\(])(\S)/g, function(_,p,l){ return p + l.toUpperCase(); }); };
+  var lower = function(s){ return String(s||'').toLowerCase(); };
+  var installSort = function(d){ var u = (d||'').toUpperCase(); if (/^INSUMOS\b/.test(u) || u.indexOf('\nINSUMOS') >= 0) return 1; if (u.indexOf('INSTALAÇÃO') >= 0 || u.indexOf('INSTALACAO') >= 0) return 2; return 0; };
+
+  // Extrai OBS: xxx do texto (se existir); retorna { text, obs }
+  function splitObs(text) {
+    if (!text) return { text: '', obs: '' };
+    var s = String(text);
+    var m = s.match(/\bOBS\s*[:.·]\s*(.+?)(?=\n|$)/i);
+    if (!m) return { text: s, obs: '' };
+    var obs = m[1].trim().replace(/[.,;]$/, '');
+    var clean = s.replace(m[0], '').replace(/\s{2,}/g, ' ').trim();
+    return { text: clean, obs: obs };
+  }
+
+  // Extrai "Metragem real Xm² + Y% de perda = Zm²" pra mid row
+  function extractMetragemTotal(itens) {
+    var reais = 0, cobrada = 0, perdaPerc = 0, matches = 0;
+    itens.forEach(function(it){
+      var d = String(it.descritivo || '');
+      var m = d.match(/Metragem\s+real\s+([\d.,]+)\s*m[²2]?(?:\s*\+\s*([\d.,]+)\s*%[^=]*=\s*([\d.,]+)\s*m[²2]?)?/i);
+      if (m) {
+        var r = parseFloat(m[1].replace(/\./g,'').replace(',','.')) || 0;
+        var p = m[2] ? parseFloat(m[2].replace(',','.')) : 0;
+        var c = m[3] ? parseFloat(m[3].replace(/\./g,'').replace(',','.')) : r;
+        reais += r; cobrada += c; if (p > perdaPerc) perdaPerc = p; matches++;
+      }
+    });
+    return matches ? { reais: reais, cobrada: cobrada, perdaPerc: perdaPerc } : null;
+  }
 
   Promise.all([
     fetch(SUPA.url + '/rest/v1/simulacao_projetos?id=eq.' + simId + '&select=*', { headers: H }).then(function(r){ return r.json(); }),
@@ -1612,25 +1653,72 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     var simArr = res[0]; var itens = res[1];
     if (!Array.isArray(simArr) || !simArr.length) { console.warn('[pkt] sim not found:', simId); return; }
     var sim = simArr[0];
+    console.log('[pkt-sim] loaded', simId, '·', itens.length, 'itens');
 
-    var groups03 = {};  // key -> [items]
-    var groups04 = {};
-    var keys03 = [];    // preserve first-seen order
-    var keys04 = [];
+    var groups03 = {}; var groups04 = {};
+    var keys03 = []; var keys04 = [];
+    var logisticaTotal = 0;
+    var obsGeral = '';
     itens.forEach(function(it){
       var raw = String(it.categoria || '').trim();
       var head = raw.split('||')[0].toUpperCase().trim();
-      if (!head || head.indexOf('LOG') === 0 || head === 'TRANSPORTE' || head.indexOf('OBS') >= 0) return;
+      if (!head) return;
+      if (head.indexOf('LOG') === 0 || head === 'TRANSPORTE') { logisticaTotal += Number(it.valor || 0); return; }
+      if (head.indexOf('OBS') >= 0) { obsGeral += (obsGeral ? '; ' : '') + String(it.descritivo||''); return; }
       var target = CH03_CATS.indexOf(head) >= 0 ? groups03 : groups04;
       var keysArr = target === groups03 ? keys03 : keys04;
       if (!target[raw]) { target[raw] = []; keysArr.push(raw); }
       target[raw].push(it);
     });
 
-    function renderCategoria(catKey, itensList, chapterIdx) {
+    // Renderiza um item (parses descritivo, extrai obs, monta HTML)
+    function renderItem(itNum, it) {
+      var meta = it.meta || {};
+      var descRaw = String(it.descritivo || '');
+      // descritivo_fixo: texto raw, sem parsing
+      if (meta.descritivo_fixo) {
+        var htmlFixo = descRaw.replace(/\n/g, '<br>');
+        return '<tr class="it" role="row">' +
+          '<td class="it__n" role="cell">' + esc(itNum) + '</td>' +
+          '<td class="it__d" role="cell"><span class="it__t" style="font-weight:400">' + htmlFixo + '</span></td>' +
+          '<td class="it__v" role="cell">' + fmtBrl(it.valor) + '</td>' +
+        '</tr>';
+      }
+      // ocultar_dim: remove padrão "MEDIDAS (...) . METRAGEM TOTAL Xm²."
+      var desc = descRaw;
+      if (meta.ocultar_dim) {
+        desc = desc.replace(/\.?\s*MEDIDAS\s*\([^)]+\)\s*\.?\s*(METRAGEM\s+TOTAL\s+[\d.,]+\s*m[²2]?\.?)?/gi, '.').replace(/\.{2,}/g,'.').trim();
+      }
+      var lines = desc.split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean);
+      var titleRaw = lines[0] || '';
+      var rest = lines.slice(1);
+      var restText = rest.join(' · ');
+      var split = splitObs(restText);
+      var subtitle = split.text;
+      var obs = split.obs;
+      // Insumos/instalação: título simples, sem subtitle
+      var upperTitle = titleRaw.toUpperCase();
+      var isInsumo = /^INSUMOS/.test(upperTitle);
+      var isInstal = /INSTALAÇÃO|INSTALACAO/.test(upperTitle);
+      var title = (isInsumo ? 'Insumos' : isInstal ? 'Instalação e gestão de obras' : titleCase(titleRaw));
+      if (isInsumo || isInstal) { subtitle = ''; obs = ''; }
+      return '<tr class="it" role="row">' +
+        '<td class="it__n" role="cell">' + esc(itNum) + '</td>' +
+        '<td class="it__d" role="cell">' +
+          '<span class="it__t">' + esc(title) + '</span>' +
+          (subtitle ? '<span class="it__s">' + esc(lower(subtitle)) + '</span>' : '') +
+          (obs ? '<span class="it__o">' + esc(lower(obs)) + '</span>' : '') +
+        '</td>' +
+        '<td class="it__v" role="cell">' + fmtBrl(it.valor) + '</td>' +
+      '</tr>';
+    }
+
+    // Renderiza um bloco categoria (header + itens + parcial)
+    function renderCategoria(catKey, itensList, startIdx) {
       var parts = catKey.split('||');
-      var catName = cap(parts[0] || '');
-      var catSpec = parts[1] ? cap(parts[1]) : '';
+      var catName = titleCase(parts[0] || '');
+      var catSpec = parts[1] ? titleCase(parts[1]) : '';
+      // 3o segmento (ex: 15/3 × 19 × 190CM) fica escondido — polui o header
       var html = '<tr class="cat" role="row"><td colspan="3" role="cell">' +
         '<span class="cat__k">' + esc(catName) + '</span>' +
         (catSpec ? '<span class="cat__n">' + esc(catSpec) + '</span>' : '') +
@@ -1641,28 +1729,37 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
         return (a.ordem||0) - (b.ordem||0);
       });
       var subtotal = 0;
-      sorted.forEach(function(it, idx){
-        var itNum = chapterIdx + '.' + (idx+1);
-        var lines = String(it.descritivo || '').split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean);
-        var title = lines[0] ? cap(lines[0]) : '';
-        var subtitle = lines.slice(1).join(' · ');
-        html += '<tr class="it" role="row">' +
-          '<td class="it__n" role="cell">' + esc(itNum) + '</td>' +
-          '<td class="it__d" role="cell">' +
-            '<span class="it__t">' + esc(title) + '</span>' +
-            (subtitle ? '<span class="it__s">' + esc(subtitle) + '</span>' : '') +
-          '</td>' +
-          '<td class="it__v" role="cell">' + fmtBrl(it.valor) + '</td>' +
-        '</tr>';
+      // Divide em produto vs aux (insumos/instalação)
+      var produtoItens = [], auxItens = [];
+      sorted.forEach(function(it){ (installSort(it.descritivo) > 0 ? auxItens : produtoItens).push(it); });
+      var localIdx = 0;
+      produtoItens.forEach(function(it){
+        localIdx++;
+        html += renderItem(startIdx + '.' + localIdx, it);
+        subtotal += Number(it.valor || 0);
+      });
+      // Mid row: metragem real total (só se ≥2 itens de produto E tem dados)
+      if (produtoItens.length >= 2) {
+        var m = extractMetragemTotal(produtoItens);
+        if (m && m.reais > 0) {
+          var midTxt = 'Metragem real total ' + m.reais.toFixed(0) + ' m²';
+          if (m.perdaPerc > 0 && m.cobrada > m.reais) midTxt += ' + ' + m.perdaPerc + '% de perda = ' + m.cobrada.toFixed(0) + ' m²';
+          var midValor = produtoItens.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
+          html += '<tr class="mid" role="row"><td role="cell"></td><td role="cell">' + esc(midTxt) + '</td><td role="cell">' + fmtBrl(midValor) + '</td></tr>';
+        }
+      }
+      auxItens.forEach(function(it){
+        localIdx++;
+        html += renderItem(startIdx + '.' + localIdx, it);
         subtotal += Number(it.valor || 0);
       });
       html += '<tr class="sub" role="row"><td role="cell"></td>' +
-        '<td role="cell">Parcial · ' + esc(catName) + '</td>' +
+        '<td role="cell">Parcial · ' + esc(catName.toLowerCase()) + '</td>' +
         '<td role="cell">' + fmtBrl(subtotal) + '</td></tr>';
-      return { html: html, subtotal: subtotal };
+      return { html: html, subtotal: subtotal, catCount: 1 };
     }
 
-    // Header data
+    // ─── Header data ───
     var cliente = sim.cliente || '—';
     var numero = String(sim.numero || '');
     var dataStr = dataFmt(sim.created_at);
@@ -1672,7 +1769,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     var vendedor = sim.vendedor || sim.orcamentista || '—';
     var arquiteto = sim.arquiteto || '';
 
-    document.title = 'Proposta ' + numero + ' · Parket';
+    document.title = 'Proposta ' + numero + ' · ' + cliente + ' · Parket';
 
     var $ = function(sel){ return document.querySelector(sel); };
     var coverTitle = $('.cover__title'); if (coverTitle) coverTitle.textContent = cliente;
@@ -1697,16 +1794,17 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       spec.innerHTML = rows.map(function(r){ return '<div class="spec__row"><dt class="spec__k">' + esc(r[0]) + '</dt><dd class="spec__v">' + esc(r[1]) + '</dd></div>'; }).join('');
     }
 
-    // Rebuild ledger — chapter 03 (revestimento)
+    // ─── Chapter 03 (revestimento) ───
     var subCh03 = 0;
+    var catCounter = 0;   // numeração contínua entre chapters
     var ch03 = $('#ch-03');
     if (ch03) {
       var lede03 = ch03.querySelector('.lede');
       if (lede03) lede03.textContent = cliente + ', ID: ' + numero;
       var tbody03 = ch03.querySelector('.ledger tbody');
       if (tbody03) {
-        var html03 = '', idx = 1;
-        keys03.forEach(function(k){ var r = renderCategoria(k, groups03[k], idx); html03 += r.html; subCh03 += r.subtotal; idx++; });
+        var html03 = '';
+        keys03.forEach(function(k){ catCounter++; var r = renderCategoria(k, groups03[k], catCounter); html03 += r.html; subCh03 += r.subtotal; });
         if (html03) tbody03.innerHTML = html03;
         var g03 = ch03.querySelector('.grand__v');
         if (g03) g03.innerHTML = '<small>R$</small>' + fmtBrl(subCh03);
@@ -1714,7 +1812,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       }
     }
 
-    // Rebuild ledger — chapter 04 (marcenaria fina + porta split by subtipo automaticamente via categoria||subtipo)
+    // ─── Chapter 04 (marcenaria fina / porta / marcenaria) ───
     var subCh04 = 0;
     var ch04 = $('#ch-04');
     if (ch04) {
@@ -1722,8 +1820,16 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       if (lede04) lede04.textContent = cliente + ', ID: ' + numero;
       var tbody04 = ch04.querySelector('.ledger tbody');
       if (tbody04) {
-        var html04 = '', idx2 = 1;
-        keys04.forEach(function(k){ var r = renderCategoria(k, groups04[k], idx2); html04 += r.html; subCh04 += r.subtotal; idx2++; });
+        var html04 = '';
+        keys04.forEach(function(k){ catCounter++; var r = renderCategoria(k, groups04[k], catCounter); html04 += r.html; subCh04 += r.subtotal; });
+        // Logística no fim do capítulo 04
+        if (logisticaTotal > 0) {
+          html04 += '<tr class="cat" role="row"><td colspan="3" role="cell">' +
+            '<span class="cat__k">Logística</span><span class="cat__n">Transporte, deslocamento, hospedagem e alimentação da equipe</span>' +
+            '</td></tr>' +
+            '<tr class="sub" role="row"><td role="cell"></td><td role="cell">Parcial · logística</td><td role="cell">' + fmtBrl(logisticaTotal) + '</td></tr>';
+          subCh04 += logisticaTotal;
+        }
         if (html04) tbody04.innerHTML = html04;
         var g04 = ch04.querySelector('.grand__v');
         if (g04) g04.innerHTML = '<small>R$</small>' + fmtBrl(subCh04);
@@ -1731,7 +1837,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       }
     }
 
-    // Chapter 05 recap + total geral
+    // ─── Chapter 05 recap + total geral ───
     var recap = $('#ch-05 .recap');
     if (recap) {
       var rhtml = '';
@@ -1747,14 +1853,29 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     var rref = $('#ch-05 .recap__ref');
     if (rref) rref.textContent = cliente + ' · validade ' + validade;
 
-    // Section head numero
+    // ─── Considerações (bloco antes da capa preta) ───
+    var consid = sim.consideracoes || obsGeral || '';
+    if (consid) {
+      // Adiciona bloco de considerações no chapter 05 antes do grand--total
+      var grandTotalEl = $('#ch-05 .grand--total');
+      if (grandTotalEl && grandTotalEl.parentNode) {
+        var block = document.createElement('div');
+        block.className = 'considera reveal';
+        block.style.cssText = 'margin-top:var(--space-8);padding:var(--space-6) 0;border-top:1px solid var(--color-line);';
+        block.innerHTML = '<p style="font-size:var(--text-2xs);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--color-text-faint);margin-bottom:var(--space-3)">Considerações</p>' +
+                          '<p style="font-size:var(--text-sm);line-height:1.6;color:var(--color-text);white-space:pre-line">' + esc(consid) + '</p>';
+        grandTotalEl.parentNode.insertBefore(block, grandTotalEl);
+      }
+    }
+
+    // ─── Section head "Proposta 99918" ───
     var shs = document.querySelectorAll('.section-head');
     for (var i = 0; i < shs.length; i++) {
       var spans = shs[i].querySelectorAll('span');
-      if (spans && spans[1] && /Proposta\s+99918/.test(spans[1].textContent)) spans[1].textContent = 'Proposta ' + numero;
+      if (spans && spans[1] && /Proposta\s+\d+/.test(spans[1].textContent)) spans[1].textContent = 'Proposta ' + numero;
     }
 
-    console.log('[pkt-sim] rendered:', simId, numero, cliente, '·', 'ch03=' + fmtBrl(subCh03), 'ch04=' + fmtBrl(subCh04));
+    console.log('[pkt-sim] rendered:', numero, cliente, '· ch03=' + fmtBrl(subCh03), '· ch04=' + fmtBrl(subCh04), '· total=' + fmtBrl(totalFinal));
   }).catch(function(err){
     console.error('[pkt-sim] load error:', err);
   });
