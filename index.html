@@ -1816,7 +1816,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
           // Extrai sub-recortes de RECDATA JSON (agrega entre todos os detalhes)
           var subItems = [];
           detalhes.forEach(function(it){
-            var m = String(it.descritivo || '').match(/__RECDATA__:\s*(\{[\s\S]*?\})/i);
+            var m = String(it.descritivo || '').match(/__RECDATA__:\s*(\{[\s\S]*\})/i);
             if (!m) return;
             try {
               var rec = JSON.parse(m[1]);
