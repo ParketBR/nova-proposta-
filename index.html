@@ -1618,8 +1618,9 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     document.body.appendChild(box);
   }
 
+  // Supabase direto — api.parket.works não libera CORS pra github.io (bloqueia preflight)
   var SUPA = {
-    url: 'https://api.parket.works',
+    url: 'https://hbxpilrxmitvzebluoom.supabase.co',
     anon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhieHBpbHJ4bWl0dnplYmx1b29tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDI1MjcsImV4cCI6MjA4ODUxODUyN30.ciZA1H-UvlYG2OPWqrFChj-_ttiFD5W5BmrST-gUJ-0'
   };
   var H = { apikey: SUPA.anon, Authorization: 'Bearer ' + SUPA.anon };
