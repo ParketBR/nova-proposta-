@@ -1582,5 +1582,183 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 })();
 </script>
 
+<!-- ═══════════════ SIM-LOADER — PKT-NOVA-PROPOSTA-DATA-20260812 ═══════════════ -->
+<!-- Quando ?sim_id=<uuid> presente (e != mockup), busca dados reais e reescreve
+     header + ledger. Sem sim_id: mockup estático (Amauri/JHSF) fica como está. -->
+<script>
+(function(){
+  var MOCK_ID = 'aaaa1111-2222-4333-8444-202608060001';
+  var qs = new URLSearchParams(location.search);
+  var simId = qs.get('sim_id') || qs.get('sim');
+  if (!simId || simId === MOCK_ID) return;
+
+  var SUPA = {
+    url: 'https://api.parket.works',
+    anon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhieHBpbHJ4bWl0dnplYmx1b29tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDI1MjcsImV4cCI6MjA4ODUxODUyN30.ciZA1H-UvlYG2OPWqrFChj-_ttiFD5W5BmrST-gUJ-0'
+  };
+  var H = { apikey: SUPA.anon, Authorization: 'Bearer ' + SUPA.anon };
+
+  var CH03_CATS = ['PISO', 'RODAPÉ', 'RODAPE', 'FORRO'];
+  var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
+  var fmtBrl = function(n){ return Number(n||0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  var dataFmt = function(iso){ try { return new Date(iso).toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' }); } catch(_){ return ''; } };
+  var cap = function(s){ return String(s||'').toLowerCase().replace(/(^|[\s\/·\-])(\S)/g, function(m,p,l){ return p + l.toUpperCase(); }); };
+  var installSort = function(d){ var u = (d||'').toUpperCase(); if (/^INSUMOS\b/.test(u) || u.indexOf('\nINSUMOS') >= 0) return 1; if (u.indexOf('INSTALAÇÃO') >= 0) return 2; return 0; };
+
+  Promise.all([
+    fetch(SUPA.url + '/rest/v1/simulacao_projetos?id=eq.' + simId + '&select=*', { headers: H }).then(function(r){ return r.json(); }),
+    fetch(SUPA.url + '/rest/v1/simulacao_itens?simulacao_id=eq.' + simId + '&select=*&order=ordem.asc', { headers: H }).then(function(r){ return r.json(); })
+  ]).then(function(res){
+    var simArr = res[0]; var itens = res[1];
+    if (!Array.isArray(simArr) || !simArr.length) { console.warn('[pkt] sim not found:', simId); return; }
+    var sim = simArr[0];
+
+    var groups03 = {};  // key -> [items]
+    var groups04 = {};
+    var keys03 = [];    // preserve first-seen order
+    var keys04 = [];
+    itens.forEach(function(it){
+      var raw = String(it.categoria || '').trim();
+      var head = raw.split('||')[0].toUpperCase().trim();
+      if (!head || head.indexOf('LOG') === 0 || head === 'TRANSPORTE' || head.indexOf('OBS') >= 0) return;
+      var target = CH03_CATS.indexOf(head) >= 0 ? groups03 : groups04;
+      var keysArr = target === groups03 ? keys03 : keys04;
+      if (!target[raw]) { target[raw] = []; keysArr.push(raw); }
+      target[raw].push(it);
+    });
+
+    function renderCategoria(catKey, itensList, chapterIdx) {
+      var parts = catKey.split('||');
+      var catName = cap(parts[0] || '');
+      var catSpec = parts[1] ? cap(parts[1]) : '';
+      var html = '<tr class="cat" role="row"><td colspan="3" role="cell">' +
+        '<span class="cat__k">' + esc(catName) + '</span>' +
+        (catSpec ? '<span class="cat__n">' + esc(catSpec) + '</span>' : '') +
+        '</td></tr>';
+      var sorted = itensList.slice().sort(function(a,b){
+        var ka = installSort(a.descritivo), kb = installSort(b.descritivo);
+        if (ka !== kb) return ka - kb;
+        return (a.ordem||0) - (b.ordem||0);
+      });
+      var subtotal = 0;
+      sorted.forEach(function(it, idx){
+        var itNum = chapterIdx + '.' + (idx+1);
+        var lines = String(it.descritivo || '').split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean);
+        var title = lines[0] ? cap(lines[0]) : '';
+        var subtitle = lines.slice(1).join(' · ');
+        html += '<tr class="it" role="row">' +
+          '<td class="it__n" role="cell">' + esc(itNum) + '</td>' +
+          '<td class="it__d" role="cell">' +
+            '<span class="it__t">' + esc(title) + '</span>' +
+            (subtitle ? '<span class="it__s">' + esc(subtitle) + '</span>' : '') +
+          '</td>' +
+          '<td class="it__v" role="cell">' + fmtBrl(it.valor) + '</td>' +
+        '</tr>';
+        subtotal += Number(it.valor || 0);
+      });
+      html += '<tr class="sub" role="row"><td role="cell"></td>' +
+        '<td role="cell">Parcial · ' + esc(catName) + '</td>' +
+        '<td role="cell">' + fmtBrl(subtotal) + '</td></tr>';
+      return { html: html, subtotal: subtotal };
+    }
+
+    // Header data
+    var cliente = sim.cliente || '—';
+    var numero = String(sim.numero || '');
+    var dataStr = dataFmt(sim.created_at);
+    var validade = String(sim.validade_dias || 30) + ' dias';
+    var endereco = String(sim.endereco || '');
+    var enderecoLinhas = endereco.split(/\r?\n/).map(function(s){ return s.trim(); }).filter(Boolean);
+    var vendedor = sim.vendedor || sim.orcamentista || '—';
+    var arquiteto = sim.arquiteto || '';
+
+    document.title = 'Proposta ' + numero + ' · Parket';
+
+    var $ = function(sel){ return document.querySelector(sel); };
+    var coverTitle = $('.cover__title'); if (coverTitle) coverTitle.textContent = cliente;
+    var coverEye = $('#ch-01 .eyebrow'); if (coverEye) coverEye.innerHTML = '<span class="eyebrow__n">01</span> Proposta comercial · ' + esc(numero);
+    var coverMeta = $('.cover__meta');
+    if (coverMeta) {
+      coverMeta.innerHTML =
+        '<div><dt>Local</dt><dd>' + esc(enderecoLinhas[0] || '—') + '</dd></div>' +
+        '<div><dt>Data</dt><dd>' + esc(dataStr) + '</dd></div>' +
+        '<div><dt>Validade</dt><dd>' + esc(validade) + '</dd></div>';
+    }
+    var spec = $('#ch-02 .spec');
+    if (spec) {
+      var contratante = arquiteto ? cliente + ' | ' + arquiteto : cliente;
+      var rows = [
+        ['Contratante', contratante],
+        ['Proposta', numero]
+      ];
+      if (enderecoLinhas[0]) rows.push(['Endereço', enderecoLinhas[0]]);
+      if (enderecoLinhas.length > 1) rows.push(['Bairro / Cidade', enderecoLinhas.slice(1).join(' · ')]);
+      rows.push(['Data', dataStr], ['Validade', validade], ['Garantia', '5 anos'], ['Vendedor', vendedor]);
+      spec.innerHTML = rows.map(function(r){ return '<div class="spec__row"><dt class="spec__k">' + esc(r[0]) + '</dt><dd class="spec__v">' + esc(r[1]) + '</dd></div>'; }).join('');
+    }
+
+    // Rebuild ledger — chapter 03 (revestimento)
+    var subCh03 = 0;
+    var ch03 = $('#ch-03');
+    if (ch03) {
+      var lede03 = ch03.querySelector('.lede');
+      if (lede03) lede03.textContent = cliente + ', ID: ' + numero;
+      var tbody03 = ch03.querySelector('.ledger tbody');
+      if (tbody03) {
+        var html03 = '', idx = 1;
+        keys03.forEach(function(k){ var r = renderCategoria(k, groups03[k], idx); html03 += r.html; subCh03 += r.subtotal; idx++; });
+        if (html03) tbody03.innerHTML = html03;
+        var g03 = ch03.querySelector('.grand__v');
+        if (g03) g03.innerHTML = '<small>R$</small>' + fmtBrl(subCh03);
+        if (!html03) ch03.style.display = 'none';
+      }
+    }
+
+    // Rebuild ledger — chapter 04 (marcenaria fina + porta split by subtipo automaticamente via categoria||subtipo)
+    var subCh04 = 0;
+    var ch04 = $('#ch-04');
+    if (ch04) {
+      var lede04 = ch04.querySelector('.lede');
+      if (lede04) lede04.textContent = cliente + ', ID: ' + numero;
+      var tbody04 = ch04.querySelector('.ledger tbody');
+      if (tbody04) {
+        var html04 = '', idx2 = 1;
+        keys04.forEach(function(k){ var r = renderCategoria(k, groups04[k], idx2); html04 += r.html; subCh04 += r.subtotal; idx2++; });
+        if (html04) tbody04.innerHTML = html04;
+        var g04 = ch04.querySelector('.grand__v');
+        if (g04) g04.innerHTML = '<small>R$</small>' + fmtBrl(subCh04);
+        if (!html04) ch04.style.display = 'none';
+      }
+    }
+
+    // Chapter 05 recap + total geral
+    var recap = $('#ch-05 .recap');
+    if (recap) {
+      var rhtml = '';
+      if (subCh03 > 0) rhtml += '<div class="recap__row"><dt class="recap__k">Revestimento Total<span class="recap__s">Piso · rodapé · forro</span></dt><dd class="recap__v">R$ ' + fmtBrl(subCh03) + '</dd></div>';
+      if (subCh04 > 0) rhtml += '<div class="recap__row"><dt class="recap__k">Marcenaria fina Total<span class="recap__s">Painel · porta · marcenaria</span></dt><dd class="recap__v">R$ ' + fmtBrl(subCh04) + '</dd></div>';
+      recap.innerHTML = rhtml;
+    }
+    var totalGeral = subCh03 + subCh04;
+    var descontoValor = totalGeral * (Number(sim.desconto_perc || 0) / 100);
+    var totalFinal = totalGeral - descontoValor + Number(sim.frete_valor || 0);
+    var gt = $('#ch-05 .grand--total .grand__v');
+    if (gt) gt.innerHTML = '<small>R$</small>' + fmtBrl(totalFinal);
+    var rref = $('#ch-05 .recap__ref');
+    if (rref) rref.textContent = cliente + ' · validade ' + validade;
+
+    // Section head numero
+    var shs = document.querySelectorAll('.section-head');
+    for (var i = 0; i < shs.length; i++) {
+      var spans = shs[i].querySelectorAll('span');
+      if (spans && spans[1] && /Proposta\s+99918/.test(spans[1].textContent)) spans[1].textContent = 'Proposta ' + numero;
+    }
+
+    console.log('[pkt-sim] rendered:', simId, numero, cliente, '·', 'ch03=' + fmtBrl(subCh03), 'ch04=' + fmtBrl(subCh04));
+  }).catch(function(err){
+    console.error('[pkt-sim] load error:', err);
+  });
+})();
+</script>
 </body>
 </html>
