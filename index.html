@@ -1756,6 +1756,41 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       '</tr>';
     }
 
+    // Extrai recortes/detalhamento de um item — 2 fontes possíveis:
+    //   1. meta.recortes: array [{nome, unidade|u, preco_unit|p, qtd}]  (NOVO — per-ambiente)
+    //   2. __RECDATA__:{JSON} no descritivo (ANTIGO — agregado por subtipo, backward compat)
+    function extractRecortes(it) {
+      var out = [];
+      var meta = it.meta || {};
+      if (Array.isArray(meta.recortes) && meta.recortes.length) {
+        meta.recortes.forEach(function(r){
+          var nome = r.nome || r.NOME; if (!nome) return;
+          var qtd = Number(r.qtd || r.QTD || 0);
+          var preco = Number(r.preco_unit || r.p || r.P || 0);
+          var u = r.unidade || r.u || r.U || 'UN';
+          out.push({ nome: String(nome).toUpperCase(), qtd: qtd, u: u, valor: qtd * preco });
+        });
+        return out;
+      }
+      var m = String(it.descritivo || '').match(/__RECDATA__:\s*(\{[\s\S]*\})/i);
+      if (m) {
+        try {
+          var rec = JSON.parse(m[1]);
+          // Pode ser objeto (map de recortes) ou array
+          var items = Array.isArray(rec) ? rec : Object.values(rec);
+          items.forEach(function(r){
+            if (!r) return;
+            var nome = r.NOME || r.nome; if (!nome) return;
+            var qtd = Number(r.QTD || r.qtd || 0);
+            var preco = Number(r.P || r.p || r.preco_unit || 0);
+            var u = r.U || r.u || r.unidade || 'UN';
+            out.push({ nome: String(nome).toUpperCase(), qtd: qtd, u: u, valor: qtd * preco });
+          });
+        } catch(_) {}
+      }
+      return out;
+    }
+
     // Renderiza HEAD completo (PISO, PORTA, etc). Numeração contínua N.M dentro do
     // head. Cada SUBTIPO tem seus próprios produtos + mid row + detalhamento + insumos +
     // instalação (NÃO mistura RIPADO com MUXARABI). No fim: 1 "Valor parcial do X".
@@ -1788,45 +1823,53 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
             (subName ? '<span class="cat__n">' + esc(subName) + '</span>' : '') +
             '</td></tr>';
         }
+        // Renderiza ambientes; cada um pode ter recortes embutidos (meta.recortes ou __RECDATA__)
+        // Se tiver, mostra sub-itens N.M.K logo abaixo do ambiente com valor individual.
+        var perAmbRecortesTotal = 0;
         produtos.forEach(function(it){
           localIdx++;
-          html += renderItem(chapterIdx + '.' + localIdx, it);
+          var ambIdx = chapterIdx + '.' + localIdx;
+          html += renderItem(ambIdx, it);
           subtotal += Number(it.valor || 0);
+          // Recortes deste ambiente
+          var subRec = extractRecortes(it);
+          if (subRec.length) {
+            subRec.forEach(function(r, i){
+              html += '<tr class="it" role="row">' +
+                '<td class="it__n" role="cell" style="padding-left:2rem;color:var(--color-text-faint)">' + esc(ambIdx + '.' + (i+1)) + '</td>' +
+                '<td class="it__d" role="cell"><span class="it__t" style="font-weight:400;color:var(--color-text-faint)">' + esc(r.qtd + ' ' + r.u.toUpperCase() + ' · ' + r.nome) + '</span></td>' +
+                '<td class="it__v" role="cell" style="color:var(--color-text-faint)">' + fmtBrl(r.valor) + '</td></tr>';
+              perAmbRecortesTotal += r.valor;
+            });
+          }
         });
-        // DETALHAMENTO DE PROJETO logo depois dos ambientes (agrupado com produtos, ANTES do mid row)
-        // Item principal N.M + sub-itens N.M.K por recorte (parse RECDATA JSON)
-        if (detalhes.length > 0) {
+        // DETALHAMENTO DE PROJETO — SEMPRE aparece se tem recortes (per-ambiente OU agregado antigo).
+        // Se per-ambiente: só o header com total (sub-itens já apareceram acima).
+        // Se agregado antigo: header + sub-itens N.M.K (backward compat).
+        var aggregatedDetTotal = detalhes.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
+        var totalDetalhamento = perAmbRecortesTotal + aggregatedDetTotal;
+        if (totalDetalhamento > 0) {
           localIdx++;
-          var detTotal = detalhes.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
           var detIdx = localIdx;
           html += '<tr class="it" role="row">' +
             '<td class="it__n" role="cell">' + esc(chapterIdx + '.' + detIdx) + '</td>' +
             '<td class="it__d" role="cell"><span class="it__t">DETALHAMENTO DE PROJETO</span></td>' +
-            '<td class="it__v" role="cell">' + fmtBrl(detTotal) + '</td></tr>';
-          subtotal += detTotal;
-          var subItems = [];
-          detalhes.forEach(function(it){
-            var m = String(it.descritivo || '').match(/__RECDATA__:\s*(\{[\s\S]*\})/i);
-            if (!m) return;
-            try {
-              var rec = JSON.parse(m[1]);
-              Object.keys(rec).forEach(function(k){
-                var r = rec[k]; if (!r) return;
-                // Data tem keys em UPPER (NOME, U, P, QTD) OU lower (nome, u, p, qtd)
-                var nome = r.NOME || r.nome; if (!nome) return;
-                var qtd = Number(r.QTD || r.qtd || 0);
-                var preco = Number(r.P || r.p || 0);
-                var u = r.U || r.u || 'UN';
-                subItems.push({ nome: String(nome).toUpperCase(), qtd: qtd, u: u, valor: qtd * preco });
-              });
-            } catch(_) {}
-          });
-          subItems.forEach(function(s, i){
-            html += '<tr class="it" role="row">' +
-              '<td class="it__n" role="cell" style="padding-left:2rem;color:var(--color-text-faint)">' + esc(chapterIdx + '.' + detIdx + '.' + (i+1)) + '</td>' +
-              '<td class="it__d" role="cell"><span class="it__t" style="font-weight:400;color:var(--color-text-faint)">' + esc(s.qtd + ' ' + s.u.toUpperCase() + ' · ' + s.nome) + '</span></td>' +
-              '<td class="it__v" role="cell" style="color:var(--color-text-faint)">' + fmtBrl(s.valor) + '</td></tr>';
-          });
+            '<td class="it__v" role="cell">' + fmtBrl(totalDetalhamento) + '</td></tr>';
+          subtotal += aggregatedDetTotal; // valor dos ambientes já entrou em produtos.valor; sum aggregate aqui
+          // Se AINDA existe agregado antigo (sem per-ambiente), lista sub-itens abaixo
+          if (perAmbRecortesTotal === 0 && detalhes.length > 0) {
+            var subItems = [];
+            detalhes.forEach(function(it){
+              var recs = extractRecortes(it);
+              recs.forEach(function(r){ subItems.push(r); });
+            });
+            subItems.forEach(function(s, i){
+              html += '<tr class="it" role="row">' +
+                '<td class="it__n" role="cell" style="padding-left:2rem;color:var(--color-text-faint)">' + esc(chapterIdx + '.' + detIdx + '.' + (i+1)) + '</td>' +
+                '<td class="it__d" role="cell"><span class="it__t" style="font-weight:400;color:var(--color-text-faint)">' + esc(s.qtd + ' ' + s.u.toUpperCase() + ' · ' + s.nome) + '</span></td>' +
+                '<td class="it__v" role="cell" style="color:var(--color-text-faint)">' + fmtBrl(s.valor) + '</td></tr>';
+            });
+          }
         }
         // Mid row: metragem real total do SUBTIPO (só se ≥2 produtos com dados)
         // NB: só soma produtos (sem detalhamento) — metragem é m² dos ambientes
