@@ -1674,8 +1674,12 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     var sim = simArr[0];
     console.log('[pkt-sim] loaded', simId, '·', itens.length, 'itens');
 
-    var groups03 = {}; var groups04 = {};
-    var keys03 = []; var keys04 = [];
+    // Agrupamento em 2 níveis: HEAD → SUBTIPO → itens
+    // heads03 = ['PISO', 'FORRO', ...] preservando ordem de aparição
+    // heads04 = ['PAINEL', 'PORTA', 'MARCENARIA', ...]
+    // groupedByHead[head] = { subtypes: {catKey: [items]}, subKeys: [ordem], allItems: [] }
+    var groupedByHead = {};
+    var heads03 = []; var heads04 = [];
     var logisticaTotal = 0;
     var obsGeral = '';
     itens.forEach(function(it){
@@ -1684,10 +1688,14 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       if (!head) return;
       if (head.indexOf('LOG') === 0 || head === 'TRANSPORTE') { logisticaTotal += Number(it.valor || 0); return; }
       if (head.indexOf('OBS') >= 0) { obsGeral += (obsGeral ? '; ' : '') + String(it.descritivo||''); return; }
-      var target = CH03_CATS.indexOf(head) >= 0 ? groups03 : groups04;
-      var keysArr = target === groups03 ? keys03 : keys04;
-      if (!target[raw]) { target[raw] = []; keysArr.push(raw); }
-      target[raw].push(it);
+      if (!groupedByHead[head]) {
+        groupedByHead[head] = { subtypes: {}, subKeys: [], allItems: [] };
+        (CH03_CATS.indexOf(head) >= 0 ? heads03 : heads04).push(head);
+      }
+      var g = groupedByHead[head];
+      if (!g.subtypes[raw]) { g.subtypes[raw] = []; g.subKeys.push(raw); }
+      g.subtypes[raw].push(it);
+      g.allItems.push(it);
     });
 
     // Renderiza um item (parses descritivo, extrai obs, monta HTML)
@@ -1737,71 +1745,81 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       '</tr>';
     }
 
-    // Renderiza um bloco categoria (header + itens + parcial)
-    function renderCategoria(catKey, itensList, startIdx) {
-      var parts = catKey.split('||');
-      // Mantém RAW (CAPS) igual PGSTRUCT35 antigo
-      var catName = String(parts[0] || '').toUpperCase();
-      var catSpec = parts[1] ? String(parts[1]).toUpperCase() : '';
-      // 3o segmento (ex: 15/3 × 19 × 190CM) fica escondido — polui o header
-      var html = '<tr class="cat" role="row"><td colspan="3" role="cell">' +
-        '<span class="cat__k">' + esc(catName) + '</span>' +
-        (catSpec ? '<span class="cat__n">' + esc(catSpec) + '</span>' : '') +
-        '</td></tr>';
-      var sorted = itensList.slice().sort(function(a,b){
-        var ka = installSort(a.descritivo), kb = installSort(b.descritivo);
-        if (ka !== kb) return ka - kb;
-        return (a.ordem||0) - (b.ordem||0);
-      });
+    // Renderiza HEAD completo (PISO, PORTA, etc). Numeração contínua N.1, N.2 ...
+    // dentro do head, mesmo com múltiplos subtipos. Insumos+Instalação consolidados
+    // no fim de tudo. 1 "Valor parcial do X" único.
+    function renderHead(head, groupData, chapterIdx) {
+      var headUpper = String(head).toUpperCase();
+      var html = '';
       var subtotal = 0;
-      // Divide em produto vs aux (insumos vs instalação) CONSOLIDADOS
-      var produtoItens = [], insumoItens = [], instalItens = [];
-      sorted.forEach(function(it){
-        var k = installSort(it.descritivo);
-        if (k === 1) insumoItens.push(it);
-        else if (k === 2) instalItens.push(it);
-        else produtoItens.push(it);
-      });
       var localIdx = 0;
-      produtoItens.forEach(function(it){
-        localIdx++;
-        html += renderItem(startIdx + '.' + localIdx, it);
-        subtotal += Number(it.valor || 0);
+      // Separa produto vs aux somando entre TODOS os subtipos
+      var allProduto = [], allInsumo = [], allInstal = [];
+      // Preserva ordem: pra cada subtipo (na ordem que veio), renderiza cat header + produtos
+      groupData.subKeys.forEach(function(catKey){
+        var parts = catKey.split('||');
+        var subName = parts[1] ? String(parts[1]).toUpperCase() : '';
+        var sorted = groupData.subtypes[catKey].slice().sort(function(a,b){
+          var ka = installSort(a.descritivo), kb = installSort(b.descritivo);
+          if (ka !== kb) return ka - kb;
+          return (a.ordem||0) - (b.ordem||0);
+        });
+        var produtos = [];
+        sorted.forEach(function(it){
+          var k = installSort(it.descritivo);
+          if (k === 1) allInsumo.push(it);
+          else if (k === 2) allInstal.push(it);
+          else produtos.push(it);
+        });
+        // Só renderiza header do subtipo se tem produtos nele
+        if (produtos.length > 0) {
+          html += '<tr class="cat" role="row"><td colspan="3" role="cell">' +
+            '<span class="cat__k">' + esc(headUpper) + '</span>' +
+            (subName ? '<span class="cat__n">' + esc(subName) + '</span>' : '') +
+            '</td></tr>';
+          produtos.forEach(function(it){
+            localIdx++;
+            html += renderItem(chapterIdx + '.' + localIdx, it);
+            subtotal += Number(it.valor || 0);
+            allProduto.push(it);
+          });
+        }
       });
-      // Mid row: metragem real total (só se ≥2 itens de produto E tem dados)
-      if (produtoItens.length >= 2) {
-        var m = extractMetragemTotal(produtoItens);
+      // Mid row: metragem real total agregada (só se tem ≥2 produtos com dados)
+      if (allProduto.length >= 2) {
+        var m = extractMetragemTotal(allProduto);
         if (m && m.reais > 0) {
-          var midTxt = 'Metragem real total ' + m.reais.toFixed(0) + ' m²';
-          if (m.perdaPerc > 0 && m.cobrada > m.reais) midTxt += ' + ' + m.perdaPerc + '% de perda = ' + m.cobrada.toFixed(0) + ' m²';
-          var midValor = produtoItens.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
+          var midTxt = 'METRAGEM REAL TOTAL ' + m.reais.toFixed(0) + ' M²';
+          if (m.perdaPerc > 0 && m.cobrada > m.reais) midTxt += ' + ' + m.perdaPerc + '% DE PERDA = ' + m.cobrada.toFixed(0) + ' M²';
+          var midValor = allProduto.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
           html += '<tr class="mid" role="row"><td role="cell"></td><td role="cell">' + esc(midTxt) + '</td><td role="cell">' + fmtBrl(midValor) + '</td></tr>';
         }
       }
-      // Consolida insumos em 1 linha (soma valores)
-      if (insumoItens.length > 0) {
+      // Insumos consolidado (1 linha)
+      if (allInsumo.length > 0) {
         localIdx++;
-        var insumoTotal = insumoItens.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
+        var insumoTotal = allInsumo.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
         html += '<tr class="it" role="row">' +
-          '<td class="it__n" role="cell">' + esc(startIdx + '.' + localIdx) + '</td>' +
-          '<td class="it__d" role="cell"><span class="it__t">Insumos</span></td>' +
+          '<td class="it__n" role="cell">' + esc(chapterIdx + '.' + localIdx) + '</td>' +
+          '<td class="it__d" role="cell"><span class="it__t">INSUMOS</span></td>' +
           '<td class="it__v" role="cell">' + fmtBrl(insumoTotal) + '</td></tr>';
         subtotal += insumoTotal;
       }
-      // Consolida instalação em 1 linha (soma valores)
-      if (instalItens.length > 0) {
+      // Instalação consolidado (1 linha)
+      if (allInstal.length > 0) {
         localIdx++;
-        var instalTotal = instalItens.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
+        var instalTotal = allInstal.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
         html += '<tr class="it" role="row">' +
-          '<td class="it__n" role="cell">' + esc(startIdx + '.' + localIdx) + '</td>' +
-          '<td class="it__d" role="cell"><span class="it__t">Instalação e gestão de obras</span></td>' +
+          '<td class="it__n" role="cell">' + esc(chapterIdx + '.' + localIdx) + '</td>' +
+          '<td class="it__d" role="cell"><span class="it__t">INSTALAÇÃO E GESTÃO DE OBRAS</span></td>' +
           '<td class="it__v" role="cell">' + fmtBrl(instalTotal) + '</td></tr>';
         subtotal += instalTotal;
       }
+      // Parcial único do head
       html += '<tr class="sub" role="row"><td role="cell"></td>' +
-        '<td role="cell">Valor parcial do ' + esc(catName) + '</td>' +
+        '<td role="cell">Valor parcial do ' + esc(headUpper) + '</td>' +
         '<td role="cell">' + fmtBrl(subtotal) + '</td></tr>';
-      return { html: html, subtotal: subtotal, catCount: 1 };
+      return { html: html, subtotal: subtotal };
     }
 
     // ─── Header data ───
@@ -1841,7 +1859,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
 
     // ─── Chapter 03 (revestimento) ───
     var subCh03 = 0;
-    var catCounter = 0;   // numeração contínua entre chapters
+    var chapterCounter = 0;   // numeração contínua entre chapters (1..N por head)
     var ch03 = $('#ch-03');
     if (ch03) {
       var lede03 = ch03.querySelector('.lede');
@@ -1849,7 +1867,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       var tbody03 = ch03.querySelector('.ledger tbody');
       if (tbody03) {
         var html03 = '';
-        keys03.forEach(function(k){ catCounter++; var r = renderCategoria(k, groups03[k], catCounter); html03 += r.html; subCh03 += r.subtotal; });
+        heads03.forEach(function(h){ chapterCounter++; var r = renderHead(h, groupedByHead[h], chapterCounter); html03 += r.html; subCh03 += r.subtotal; });
         if (html03) tbody03.innerHTML = html03;
         var g03 = ch03.querySelector('.grand__v');
         if (g03) g03.innerHTML = '<small>R$</small>' + fmtBrl(subCh03);
@@ -1866,13 +1884,13 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       var tbody04 = ch04.querySelector('.ledger tbody');
       if (tbody04) {
         var html04 = '';
-        keys04.forEach(function(k){ catCounter++; var r = renderCategoria(k, groups04[k], catCounter); html04 += r.html; subCh04 += r.subtotal; });
+        heads04.forEach(function(h){ chapterCounter++; var r = renderHead(h, groupedByHead[h], chapterCounter); html04 += r.html; subCh04 += r.subtotal; });
         // Logística no fim do capítulo 04
         if (logisticaTotal > 0) {
           html04 += '<tr class="cat" role="row"><td colspan="3" role="cell">' +
-            '<span class="cat__k">Logística</span><span class="cat__n">Transporte, deslocamento, hospedagem e alimentação da equipe</span>' +
+            '<span class="cat__k">LOGÍSTICA</span><span class="cat__n">TRANSPORTE, DESLOCAMENTO, HOSPEDAGEM E ALIMENTAÇÃO DA EQUIPE</span>' +
             '</td></tr>' +
-            '<tr class="sub" role="row"><td role="cell"></td><td role="cell">Parcial · logística</td><td role="cell">' + fmtBrl(logisticaTotal) + '</td></tr>';
+            '<tr class="sub" role="row"><td role="cell"></td><td role="cell">Valor parcial da LOGÍSTICA</td><td role="cell">' + fmtBrl(logisticaTotal) + '</td></tr>';
           subCh04 += logisticaTotal;
         }
         if (html04) tbody04.innerHTML = html04;
