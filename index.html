@@ -1793,27 +1793,17 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
           html += renderItem(chapterIdx + '.' + localIdx, it);
           subtotal += Number(it.valor || 0);
         });
-        // Mid row: metragem real total do SUBTIPO (só se ≥2 produtos com dados)
-        if (produtos.length >= 2) {
-          var m = extractMetragemTotal(produtos);
-          if (m && m.reais > 0) {
-            var midTxt = 'METRAGEM REAL TOTAL ' + m.reais.toFixed(0) + ' M²';
-            if (m.perdaPerc > 0 && m.cobrada > m.reais) midTxt += ' + ' + m.perdaPerc + '% DE PERDA = ' + m.cobrada.toFixed(0) + ' M²';
-            var midValor = produtos.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
-            html += '<tr class="mid" role="row"><td role="cell"></td><td role="cell">' + esc(midTxt) + '</td><td role="cell">' + fmtBrl(midValor) + '</td></tr>';
-          }
-        }
-        // Detalhamento de projeto: 1 item principal N.M + sub-itens N.M.K por recorte (parse RECDATA JSON)
+        // DETALHAMENTO DE PROJETO logo depois dos ambientes (agrupado com produtos, ANTES do mid row)
+        // Item principal N.M + sub-itens N.M.K por recorte (parse RECDATA JSON)
         if (detalhes.length > 0) {
           localIdx++;
           var detTotal = detalhes.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
-          var detIdx = localIdx; // guarda o número base pros sub-itens
+          var detIdx = localIdx;
           html += '<tr class="it" role="row">' +
             '<td class="it__n" role="cell">' + esc(chapterIdx + '.' + detIdx) + '</td>' +
             '<td class="it__d" role="cell"><span class="it__t">DETALHAMENTO DE PROJETO</span></td>' +
             '<td class="it__v" role="cell">' + fmtBrl(detTotal) + '</td></tr>';
           subtotal += detTotal;
-          // Extrai sub-recortes de RECDATA JSON (agrega entre todos os detalhes)
           var subItems = [];
           detalhes.forEach(function(it){
             var m = String(it.descritivo || '').match(/__RECDATA__:\s*(\{[\s\S]*\})/i);
@@ -1836,6 +1826,17 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
               '<td class="it__d" role="cell"><span class="it__t" style="font-weight:400;color:var(--color-text-faint)">' + esc(s.qtd + ' ' + s.u.toUpperCase() + ' · ' + s.nome) + '</span></td>' +
               '<td class="it__v" role="cell" style="color:var(--color-text-faint)">' + fmtBrl(s.valor) + '</td></tr>';
           });
+        }
+        // Mid row: metragem real total do SUBTIPO (só se ≥2 produtos com dados)
+        // NB: só soma produtos (sem detalhamento) — metragem é m² dos ambientes
+        if (produtos.length >= 2) {
+          var m = extractMetragemTotal(produtos);
+          if (m && m.reais > 0) {
+            var midTxt = 'METRAGEM REAL TOTAL ' + m.reais.toFixed(0) + ' M²';
+            if (m.perdaPerc > 0 && m.cobrada > m.reais) midTxt += ' + ' + m.perdaPerc + '% DE PERDA = ' + m.cobrada.toFixed(0) + ' M²';
+            var midValor = produtos.reduce(function(s,i){ return s + Number(i.valor||0); }, 0);
+            html += '<tr class="mid" role="row"><td role="cell"></td><td role="cell">' + esc(midTxt) + '</td><td role="cell">' + fmtBrl(midValor) + '</td></tr>';
+          }
         }
         // Insumos consolidado (por SUBTIPO)
         if (insumos.length > 0) {
