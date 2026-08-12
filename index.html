@@ -1716,7 +1716,8 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       if (meta.ocultar_dim) {
         desc = desc.replace(/\.?\s*MEDIDAS\s*\([^)]+\)\s*\.?\s*(METRAGEM\s+TOTAL\s+[\d.,]+\s*m[²2]?\.?)?/gi, '.').replace(/\.{2,}/g,'.').trim();
       }
-      var lines = desc.split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean);
+      // Data tem tanto \n real (0x0A) quanto \n literal (2 chars "\" + "n"). Split nos dois.
+      var lines = desc.replace(/\\n/g, '\n').split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean);
       var titleRaw = lines[0] || '';
       var rest = lines.slice(1);
       // Junta demais linhas com <br> pra preservar separação vertical (não " · ")
