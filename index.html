@@ -1731,13 +1731,13 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       // Mantém texto RAW da data (CAPS). Só sobrescreve labels de insumo/instalação.
       var title = (isInsumo ? 'INSUMOS' : isInstal ? 'INSTALAÇÃO E GESTÃO DE OBRAS' : titleRaw);
       if (isInsumo || isInstal) { subtitle = ''; obs = ''; }
-      // Preserva quebras de linha internas convertendo \n em <br>
-      var subHtml = subtitle ? esc(subtitle).replace(/\n/g, '<br>') : '';
-      var obsHtml = obs ? esc(obs) : '';
+      // Força CAPS igual PGSTRUCT35 antigo — preserva quebras de linha via <br>
+      var subHtml = subtitle ? esc(subtitle.toUpperCase()).replace(/\n/g, '<br>') : '';
+      var obsHtml = obs ? esc(obs.toUpperCase()) : '';
       return '<tr class="it" role="row">' +
         '<td class="it__n" role="cell">' + esc(itNum) + '</td>' +
         '<td class="it__d" role="cell">' +
-          '<span class="it__t">' + esc(title) + '</span>' +
+          '<span class="it__t">' + esc(String(title).toUpperCase()) + '</span>' +
           (subHtml ? '<span class="it__s">' + subHtml + '</span>' : '') +
           (obsHtml ? '<span class="it__o">' + obsHtml + '</span>' : '') +
         '</td>' +
