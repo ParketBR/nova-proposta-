@@ -1604,6 +1604,20 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
   var simId = qs.get('sim_id') || qs.get('sim');
   if (!simId || simId === MOCK_ID) return;
 
+  // Fallback visual: se der erro, esconde mockup e mostra "Erro"
+  function showError(msg) {
+    var deck = document.getElementById('deck') || document.body;
+    var st = document.createElement('style');
+    st.textContent = '#deck > section, #deck > *, .rail, .runner { display:none !important; }';
+    document.head.appendChild(st);
+    var box = document.createElement('div');
+    box.style.cssText = 'position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;font-family:system-ui,sans-serif;background:#fff;color:#111';
+    box.innerHTML = '<h1 style="font-weight:400;font-size:1.5rem;margin:0 0 1rem">Não foi possível carregar a proposta</h1>' +
+      '<p style="color:#666;margin:0 0 2rem;max-width:26rem">' + (msg || 'Erro inesperado.') + '</p>' +
+      '<a href="?legacy=1" style="padding:.7rem 1.4rem;background:#111;color:#fff;text-decoration:none;font-size:.9rem;letter-spacing:.05em">Ver formato antigo →</a>';
+    document.body.appendChild(box);
+  }
+
   var SUPA = {
     url: 'https://api.parket.works',
     anon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhieHBpbHJ4bWl0dnplYmx1b29tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDI1MjcsImV4cCI6MjA4ODUxODUyN30.ciZA1H-UvlYG2OPWqrFChj-_ttiFD5W5BmrST-gUJ-0'
@@ -1651,7 +1665,8 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     fetch(SUPA.url + '/rest/v1/simulacao_itens?simulacao_id=eq.' + simId + '&select=*&order=ordem.asc', { headers: H }).then(function(r){ return r.json(); })
   ]).then(function(res){
     var simArr = res[0]; var itens = res[1];
-    if (!Array.isArray(simArr) || !simArr.length) { console.warn('[pkt] sim not found:', simId); return; }
+    if (!Array.isArray(simArr) || !simArr.length) { showError('Proposta não encontrada (id: ' + simId + ').'); return; }
+    if (!Array.isArray(itens)) itens = [];
     var sim = simArr[0];
     console.log('[pkt-sim] loaded', simId, '·', itens.length, 'itens');
 
@@ -1878,6 +1893,7 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
     console.log('[pkt-sim] rendered:', numero, cliente, '· ch03=' + fmtBrl(subCh03), '· ch04=' + fmtBrl(subCh04), '· total=' + fmtBrl(totalFinal));
   }).catch(function(err){
     console.error('[pkt-sim] load error:', err);
+    showError('Falha ao carregar dados da proposta. ' + (err && err.message ? err.message : ''));
   });
 })();
 </script>
