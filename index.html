@@ -1901,6 +1901,34 @@ body[data-tone="paper"]{ --rail-bg:var(--color-bg); --rail-line:var(--color-line
       }
     }
 
+    // ─── Renumera eyebrows + rail + botões "next" dinamicamente ───
+    // Se um chapter foi escondido (sem itens), os demais renumeram (01, 02, 03...).
+    (function renumberChapters(){
+      var chSelectors = ['#ch-01', '#ch-02', '#ch-03', '#ch-04', '#ch-05'];
+      var visible = [];
+      chSelectors.forEach(function(sel){
+        var el = document.querySelector(sel);
+        if (el && el.style.display !== 'none') visible.push({sel: sel, el: el});
+      });
+      // Renumera eyebrows de cada chapter visível
+      visible.forEach(function(v, idx){
+        var num = String(idx + 1).padStart(2, '0');
+        var eyeNum = v.el.querySelector('.eyebrow__n');
+        if (eyeNum) eyeNum.textContent = num;
+      });
+      // Esconde items da rail (sidebar) que apontam pra chapters escondidos
+      document.querySelectorAll('.rail__item').forEach(function(a){
+        var href = a.getAttribute('href') || '';
+        var el = document.querySelector(href);
+        if (el && el.style.display === 'none') a.style.display = 'none';
+      });
+      // Renumera .rail__num restantes
+      var railVisible = document.querySelectorAll('.rail__item:not([style*="display: none"]) .rail__num');
+      railVisible.forEach(function(rn, idx){
+        rn.textContent = String(idx + 1).padStart(2, '0');
+      });
+    })();
+
     // ─── Chapter 05 recap + total geral ───
     var recap = $('#ch-05 .recap');
     if (recap) {
